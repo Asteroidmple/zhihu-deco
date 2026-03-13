@@ -26,7 +26,7 @@ object OpenInBrowser {
                     contentType(ContentType.Application.Json)
                     setBody(
                         buildJsonObject {
-                            put("title", "Zhihu++: 要在浏览器中打开的内容")
+                            put("title", "Zhihu-deco: 要在浏览器中打开的内容")
                             put("description", "com.github.zly2006.zhplus.openinbrowser")
                             put("is_public", false)
                         },

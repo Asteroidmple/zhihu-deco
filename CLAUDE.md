@@ -1,4 +1,4 @@
-# Zhihu++ Agent Instructions
+# Zhihu-deco Agent Instructions
 
 本项目是隐私增强的知乎 Android 客户端，支持本地推荐算法、广告屏蔽、内容过滤。
 

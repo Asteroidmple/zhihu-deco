@@ -20,8 +20,8 @@ import java.io.File
 import java.net.URI
 
 object UpdateManager {
-    private const val GITHUB_API_LATEST = "https://api.github.com/repos/zly2006/zhihu-plus-plus/releases/latest"
-    private const val GITHUB_API_NIGHTLY = "https://api.github.com/repos/zly2006/zhihu-plus-plus/releases/tags/nightly"
+    private const val GITHUB_API_LATEST = "https://api.github.com/repos/zly2006/zhihu-deco/releases/latest"
+    private const val GITHUB_API_NIGHTLY = "https://api.github.com/repos/zly2006/zhihu-deco/releases/tags/nightly"
     private const val PREF_SKIPPED_VERSION = "skippedVersion"
     private const val PREF_AUTO_CHECK_UPDATES = "autoCheckUpdates"
     private const val PREF_LAST_UPDATE_CHECK = "lastUpdateCheck"

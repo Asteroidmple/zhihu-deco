@@ -86,7 +86,7 @@ fun telemetry(context: Context, usage: String) {
                         contentType(ContentType.Application.Json)
                         header(
                             HttpHeaders.UserAgent,
-                            "Zhihu++/${BuildConfig.VERSION_NAME}",
+                            "Zhihu-deco/${BuildConfig.VERSION_NAME}",
                         )
                     }
             }

@@ -313,7 +313,7 @@ class MainActivity : ComponentActivity() {
                             showUpdateDialog(
                                 updateState.version.toString(),
                                 updateState.isNightly,
-                                updateState.releaseNotes?.replace("https://github.com/zly2006/zhihu-plus-plus/pull/", "#"),
+                                updateState.releaseNotes?.replace("https://github.com/zly2006/zhihu-deco/pull/", "#"),
                             )
                         }
                     }

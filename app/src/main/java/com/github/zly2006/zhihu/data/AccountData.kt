@@ -96,7 +96,7 @@ object AccountData {
 
     fun cookieStorage(context: Context, cookies: MutableMap<String, String>? = null) = object : CookiesStorage {
         override suspend fun addCookie(requestUrl: Url, cookie: Cookie) {
-            // https://github.com/zly2006/zhihu-plus-plus/issues/25#issuecomment-3311926550
+            // https://github.com/zly2006/zhihu-deco/issues/25#issuecomment-3311926550
             if (cookie.name == "z_c0" && cookie.value.isBlank()) {
                 // 避免被登出
                 return

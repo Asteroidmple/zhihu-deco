@@ -198,12 +198,12 @@ fun SystemAndUpdateSettingsScreen() {
                 SelectionContainer {
                     Text(
                         buildAnnotatedString {
-                            val prRegex = Regex("https://github.com/zly2006/zhihu-plus-plus/pull/(\\d+)")
+                            val prRegex = Regex("https://github.com/Asteroidmple/zhihu-deco/pull/(\\d+)")
                             var lastIndex = 0
                             prRegex.findAll(releaseNotes!!).forEach { matchResult ->
                                 append(releaseNotes!!.substring(lastIndex, matchResult.range.first))
                                 val prNumber = matchResult.groupValues[1]
-                                withLink(LinkAnnotation.Url("https://github.com/zly2006/zhihu-plus-plus/pull/$prNumber")) {
+                                withLink(LinkAnnotation.Url("https://github.com/Asteroidmple/zhihu-deco/pull/$prNumber")) {
                                     withStyle(
                                         MaterialTheme.typography.bodyMedium
                                             .copy(color = MaterialTheme.colorScheme.primary)
@@ -221,7 +221,7 @@ fun SystemAndUpdateSettingsScreen() {
                     )
                 }
                 Button(onClick = {
-                    luoTianYiUrlLauncher(context, "https://github.com/zly2006/zhihu-plus-plus/releases".toUri())
+                    luoTianYiUrlLauncher(context, "https://github.com/Asteroidmple/zhihu-deco/releases".toUri())
                 }) {
                     Text("查看完整更新日志")
                 }
@@ -242,7 +242,7 @@ fun SystemAndUpdateSettingsScreen() {
 
             ListItem(
                 headlineContent = { Text("Discord 频道") },
-                supportingContent = { Text("请在 my-other-apps/zhihu-plus-plus 频道讨论") },
+                supportingContent = { Text("请在 my-other-apps/zhihu-deco 频道讨论") },
                 trailingContent = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null) },
                 modifier = Modifier.clickable { luoTianYiUrlLauncher(context, "https://discord.gg/YCPFZV5XSA".toUri()) },
             )
@@ -258,7 +258,7 @@ fun SystemAndUpdateSettingsScreen() {
                 headlineContent = { Text("Github issue") },
                 supportingContent = { Text("欢迎提交 issue 讨论功能和反馈问题") },
                 trailingContent = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null) },
-                modifier = Modifier.clickable { luoTianYiUrlLauncher(context, "https://github.com/zly2006/zhihu-plus-plus/issues".toUri()) },
+                modifier = Modifier.clickable { luoTianYiUrlLauncher(context, "https://github.com/Asteroidmple/zhihu-deco/issues".toUri()) },
             )
         }
     }

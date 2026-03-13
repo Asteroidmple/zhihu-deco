@@ -313,7 +313,7 @@ fun AccountSettingScreen(
                 onClick = {
                     val intent = Intent(
                         Intent.ACTION_VIEW,
-                        "https://github.com/zly2006/zhihu-plus-plus".toUri(),
+                        "https://github.com/zly2006/zhihu-deco".toUri(),
                     )
                     context.startActivity(intent)
                 },
@@ -326,7 +326,7 @@ fun AccountSettingScreen(
                 onClick = {
                     val intent = Intent(
                         Intent.ACTION_VIEW,
-                        "https://github.com/zly2006/zhihu-plus-plus/blob/master/LICENSE.md".toUri(),
+                        "https://github.com/zly2006/zhihu-deco/blob/master/LICENSE.md".toUri(),
                     )
                     context.startActivity(intent)
                 },
