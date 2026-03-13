@@ -1,6 +1,6 @@
 # Zhihu-deco：注重隐私、互联网个人权利和无广告的知乎客户端
 
-[![GitHub release](https://img.shields.io/github/v/release/zly2006/zhihu-deco) ![](https://img.shields.io/github/downloads/zly2006/zhihu-deco/total)](https://github.com/zly2006/zhihu-deco/releases)
+[![GitHub release](https://img.shields.io/github/v/release/Asteroidmple/zhihu-deco) ![](https://img.shields.io/github/downloads/Asteroidmple/zhihu-deco/total)](https://github.com/Asteroidmple/zhihu-deco/releases)
 
 本项目还不够完善，欢迎PR，如果对第三方知乎客户端有兴趣，也可以试试时间更早、功能更全面的[Hydrogen](https://github.com/zhihulite/Hydrogen)
 
