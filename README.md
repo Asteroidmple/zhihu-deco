@@ -1,7 +1,5 @@
 # Zhihu-deco：注重隐私、互联网个人权利和无广告的知乎客户端
 
-[![GitHub release](https://img.shields.io/github/v/release/Asteroidmple/zhihu-deco) ![](https://img.shields.io/github/downloads/Asteroidmple/zhihu-deco/total)](https://github.com/Asteroidmple/zhihu-deco/releases)
-
 本项目还不够完善，欢迎PR，如果对第三方知乎客户端有兴趣，也可以试试时间更早、功能更全面的[Hydrogen](https://github.com/zhihulite/Hydrogen)
 
 Zhihu-deco 独创本地推荐算法，把内容推荐完全放在本地进行，为您提供和筛选高质量内容。
