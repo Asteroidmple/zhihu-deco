@@ -44,6 +44,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
@@ -51,6 +52,7 @@ import androidx.core.content.edit
 import com.github.zly2006.zhihu.Account
 import com.github.zly2006.zhihu.LocalNavigator
 import com.github.zly2006.zhihu.MainActivity
+import com.github.zly2006.zhihu.R
 import com.github.zly2006.zhihu.SentenceSimilarityTest
 import com.github.zly2006.zhihu.data.AccountData
 import com.github.zly2006.zhihu.ui.PREFERENCE_NAME
@@ -87,7 +89,7 @@ fun DeveloperSettingsScreen() {
                 title = { Text("开发者选项") },
                 navigationIcon = {
                     IconButton(onClick = navigator.onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "返回")
+                        Icon(painterResource(id = R.drawable.ic_arrow_back), contentDescription = "返回")
                     }
                 },
                 windowInsets = WindowInsets(0),

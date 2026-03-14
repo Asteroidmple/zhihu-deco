@@ -55,6 +55,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.edit
 import com.github.zly2006.zhihu.Account
@@ -64,6 +65,7 @@ import com.github.zly2006.zhihu.Home
 import com.github.zly2006.zhihu.HotList
 import com.github.zly2006.zhihu.LocalNavigator
 import com.github.zly2006.zhihu.OnlineHistory
+import com.github.zly2006.zhihu.R
 import com.github.zly2006.zhihu.theme.ThemeManager
 import com.github.zly2006.zhihu.theme.ThemeMode
 import com.github.zly2006.zhihu.ui.PREFERENCE_NAME

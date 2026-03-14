@@ -142,15 +142,14 @@ tasks.register<Delete>("cleanRust") {
     delete(jniLibsDir)
 }
 
-// Make clean depend on cleanRust
-tasks.named("clean") {
-    dependsOn("cleanRust")
-}
-
-// Make preBuild depend on buildRustLib
-tasks.matching { it.name.startsWith("preBuild") }.configureEach {
-    dependsOn("buildRustLib")
-}
+// TEMPORARILY DISABLED: Rust compilation not required for basic functionality
+// Uncomment these lines if you need Rust features and have cargo-ndk installed
+// tasks.named("clean") {
+//     dependsOn("cleanRust")
+// }
+// tasks.matching { it.name.startsWith("preBuild") }.configureEach {
+//     dependsOn("buildRustLib")
+// }
 
 dependencies {
     implementation("androidx.core:core-ktx:1.17.0")

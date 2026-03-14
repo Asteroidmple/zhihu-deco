@@ -45,11 +45,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -66,6 +67,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.github.zly2006.zhihu.R
 import com.github.zly2006.zhihu.Account
 import com.github.zly2006.zhihu.Article
 import com.github.zly2006.zhihu.CollectionContent
@@ -283,7 +285,7 @@ fun ZhihuMain(modifier: Modifier = Modifier, navController: NavHostController) {
                         fun Item(
                             destination: NavDestination,
                             label: String,
-                            icon: ImageVector,
+                            icon: androidx.compose.ui.graphics.vector.ImageVector,
                         ) {
                             NavigationBarItem(
                                 navEntry.hasRoute(destination::class),

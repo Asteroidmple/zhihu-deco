@@ -13,10 +13,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.ui.res.painterResource
+import com.github.zly2006.zhihu.R
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -73,7 +74,7 @@ fun SystemAndUpdateSettingsScreen() {
                 title = { Text("系统与更新") },
                 navigationIcon = {
                     IconButton(onClick = navigator.onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "返回")
+                        Icon(painterResource(id = R.drawable.ic_arrow_back), contentDescription = "返回")
                     }
                 },
                 windowInsets = WindowInsets(0),
