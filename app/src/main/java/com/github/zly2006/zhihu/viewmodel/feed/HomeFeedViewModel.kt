@@ -54,72 +54,28 @@ class HomeFeedViewModel :
                 .filter { feed -> feed.target?.navDestination != null }
                 .map { feed -> createDisplayItem(context, feed) }
 
-            // 立即展示所有内容，不等待过滤
             val preferences = context.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
-            if (!preferences.getBoolean("reverseBlock", false)) {
-                withContext(Dispatchers.Main) {
-                    newItems.forEach { item ->
-                        if (displayItems.none { it.navDestination == item.navDestination }) {
-                            displayItems.add(item)
-                        }
-                    }
-                }
-            }
 
             // 后台运行内容过滤
             val filteredItems = ContentFilterExtensions.applyContentFilterToDisplayItems(context, newItems)
-            val newDestinations = newItems.map { it.navDestination }.toSet()
-
-            if (preferences.getBoolean("reverseBlock", false)) {
-                displayItems.addAll(filteredItems)
-            }
+            val newDestinations = filteredItems.map { it.navDestination }.toSet()
 
             // 记录内容展示
             recordContentDisplays(context, filteredItems)
 
-            // 移除被过滤的条目，并更新已保留条目的 raw 内容
+            // 更新 displayItems：只添加未被过滤的条目
             withContext(Dispatchers.Main) {
+                // 移除之前加载但这次被过滤掉的条目
                 displayItems.removeAll { item ->
-                    if (item.navDestination !in newDestinations) return@removeAll false
-                    val filteredVersion = filteredItems.find { it.navDestination == item.navDestination }
-                    item.raw = filteredVersion?.raw ?: item.raw
-                    // remove if no filtered version exists, which means it was filtered out
-                    filteredVersion == null
+                    item.navDestination in newDestinations && filteredItems.none { it.navDestination == item.navDestination }
                 }
-            }
-        }
-    }
-
-    private suspend fun recordContentDisplays(context: Context, items: List<FeedDisplayItem>) {
-        withContext(Dispatchers.IO) {
-            try {
-                items.forEach { item ->
-                    when (val dest = item.navDestination) {
-                        is com.github.zly2006.zhihu.Article -> {
-                            val contentType = when (dest.type) {
-                                com.github.zly2006.zhihu.ArticleType.Answer -> ContentType.ANSWER
-                                com.github.zly2006.zhihu.ArticleType.Article -> ContentType.ARTICLE
-                            }
-                            ContentFilterExtensions.recordContentDisplay(
-                                context,
-                                contentType,
-                                dest.id.toString(),
-                            )
-                        }
-                        is com.github.zly2006.zhihu.Question -> {
-                            ContentFilterExtensions.recordContentDisplay(
-                                context,
-                                ContentType.QUESTION,
-                                dest.questionId.toString(),
-                            )
-                        }
-                        else -> {
-                            // 其他类型暂不处理
-                        }
+                
+                // 添加新的未被过滤的条目
+                filteredItems.forEach { item ->
+                    if (displayItems.none { it.navDestination == item.navDestination }) {
+                        displayItems.add(item)
                     }
                 }
-            } catch (e: Exception) {
-                Log.e("HomeFeedViewModel", "Failed to record content displays", e)
             }
         }
     }

@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
@@ -149,6 +150,7 @@ fun FollowingUsersRow() {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier
+                            .width(72.dp)
                             .clickable {
                                 navigator.onNavigate(
                                     Person(
@@ -158,7 +160,8 @@ fun FollowingUsersRow() {
                                         jumpTo = "动态",
                                     ),
                                 )
-                            }.padding(vertical = 4.dp),
+                            }
+                            .padding(vertical = 4.dp, horizontal = 4.dp),
                     ) {
                         BadgedBox(
                             badge = {
@@ -182,7 +185,7 @@ fun FollowingUsersRow() {
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             textAlign = TextAlign.Center,
-                            modifier = Modifier.size(width = 60.dp, height = 18.dp),
+                            modifier = Modifier.fillMaxWidth(),
                         )
                     }
                 }

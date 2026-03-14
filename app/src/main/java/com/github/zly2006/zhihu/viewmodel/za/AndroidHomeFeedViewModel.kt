@@ -148,34 +148,27 @@ class AndroidHomeFeedViewModel :
                         }
                     }
 
-                // 立即展示所有内容
                 val preferences = context.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
-                if (!preferences.getBoolean("reverseBlock", false)) {
-                    withContext(Dispatchers.Main) {
-                        itemsToDisplay.forEach { item ->
-                            if (displayItems.none { it.navDestination == item.navDestination }) {
-                                displayItems.add(item)
-                            }
-                        }
-                    }
-                }
 
                 // 后台运行内容过滤
                 val filteredItems = ContentFilterExtensions.applyContentFilterToDisplayItems(context, itemsToDisplay)
-                val newDestinations = itemsToDisplay.map { it.navDestination }.toSet()
+                val newDestinations = filteredItems.map { it.navDestination }.toSet()
 
-                if (preferences.getBoolean("reverseBlock", false)) {
-                    displayItems.addAll(filteredItems)
-                }
+                // 记录内容展示
+                recordContentDisplays(context, filteredItems)
 
-                // 移除被过滤的条目，并更新已保留条目的 raw 内容
+                // 更新 displayItems：只添加未被过滤的条目
                 withContext(Dispatchers.Main) {
+                    // 移除之前加载但这次被过滤掉的条目
                     displayItems.removeAll { item ->
-                        if (item.navDestination !in newDestinations) return@removeAll false
-                        val filteredVersion = filteredItems.find { it.navDestination == item.navDestination }
-                        item.raw = filteredVersion?.raw ?: item.raw
-                        // remove if no filtered version exists, which means it was filtered out
-                        filteredVersion == null
+                        item.navDestination in newDestinations && filteredItems.none { it.navDestination == item.navDestination }
+                    }
+                    
+                    // 添加新的未被过滤的条目
+                    filteredItems.forEach { item ->
+                        if (displayItems.none { it.navDestination == item.navDestination }) {
+                            displayItems.add(item)
+                        }
                     }
                 }
 

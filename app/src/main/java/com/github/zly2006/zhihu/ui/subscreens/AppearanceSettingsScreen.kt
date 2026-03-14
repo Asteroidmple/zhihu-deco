@@ -413,6 +413,18 @@ fun AppearanceSettingsScreen(
                 },
             )
 
+            val showQrLoginButtons = remember { mutableStateOf(preferences.getBoolean("showQrLoginButtons", false)) }
+            SwitchSettingItem(
+                title = "显示扫码登录和退出按钮",
+                description = "在账号页面显示扫码登录和退出登录按钮（默认隐藏）",
+                checked = showQrLoginButtons.value,
+                onCheckedChange = {
+                    showQrLoginButtons.value = it
+                    preferences.edit { putBoolean("showQrLoginButtons", it) }
+                    Toast.makeText(context, "已${if (it) "启用" else "禁用"}，请重启应用后生效", Toast.LENGTH_SHORT).show()
+                },
+            )
+
             val showRefreshFab = remember { mutableStateOf(preferences.getBoolean("showRefreshFab", true)) }
             SwitchSettingItem(
                 title = "显示刷新 FAB 按钮",

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -354,114 +355,118 @@ private fun FeedCardContent(
         }
     }
 
-    Row {
-        Column(
-            modifier = Modifier.weight(2f),
-        ) {
+    Column {
+        if (!item.summary.isNullOrBlank()) {
             Text(
-                text = parseHtmlTextWithTheme(item.summary ?: ""),
+                text = parseHtmlTextWithTheme(item.summary),
                 fontSize = 14.sp,
+                lineHeight = 20.sp,
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.padding(
-                    top = if (item.isFiltered) 0.dp else 3.dp,
+                    top = if (item.isFiltered) 0.dp else 4.dp,
                 ),
             )
+        }
 
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.Bottom,
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
             if (item.details.isNotEmpty()) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
+                Text(
+                    text = item.details,
+                    fontSize = 12.sp,
+                    lineHeight = 16.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f),
+                )
+            }
+            
+            Box {
+                IconButton(
+                    onClick = { onShowMenuChange(true) },
+                    modifier = Modifier.size(36.dp),
                 ) {
-                    Text(
-                        text = item.details,
-                        fontSize = 12.sp,
-                        lineHeight = 12.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.weight(1f),
+                    Icon(
+                        imageVector = Icons.Default.MoreVert,
+                        contentDescription = "更多选项",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(20.dp),
                     )
-                    Box {
-                        IconButton(
-                            onClick = { onShowMenuChange(true) },
-                            modifier = Modifier.size(24.dp),
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.MoreVert,
-                                contentDescription = "更多选项",
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.size(16.dp),
-                            )
+                }
+                DropdownMenu(
+                    expanded = showMenu,
+                    onDismissRequest = { onShowMenuChange(false) },
+                ) {
+                    @Suppress("SimplifyBooleanWithConstants", "KotlinConstantConditions")
+                    if (onBlockByKeywords != null && !BuildConfig.IS_LITE) {
+                        DropdownMenuItem(
+                            text = { Text("按关键词屏蔽") },
+                            onClick = {
+                                onShowMenuChange(false)
+                                onBlockByKeywords(item)
+                            },
+                        )
+                    }
+                    DropdownMenuItem(
+                        text = { Text("屏蔽用户") },
+                        onClick = {
+                            onShowMenuChange(false)
+                            onBlockUser?.invoke(item)
+                        },
+                    )
+                    if (onBlockTopic != null && item.raw != null) {
+                        val topics = when (val raw = item.raw) {
+                            is com.github.zly2006.zhihu.data.DataHolder.Answer -> raw.question.topics
+                            is com.github.zly2006.zhihu.data.DataHolder.Question -> raw.topics
+                            is com.github.zly2006.zhihu.data.DataHolder.Article -> raw.topics ?: emptyList()
+                            else -> emptyList()
                         }
-                        DropdownMenu(
-                            expanded = showMenu,
-                            onDismissRequest = { onShowMenuChange(false) },
-                        ) {
-                            @Suppress("SimplifyBooleanWithConstants", "KotlinConstantConditions")
-                            if (onBlockByKeywords != null && !BuildConfig.IS_LITE) {
-                                DropdownMenuItem(
-                                    text = { Text("按关键词屏蔽") },
-                                    onClick = {
-                                        onShowMenuChange(false)
-                                        onBlockByKeywords(item)
-                                    },
-                                )
-                            }
+                        topics.forEach { topic ->
                             DropdownMenuItem(
-                                text = { Text("屏蔽用户") },
+                                text = { Text("屏蔽「${topic.name}」") },
                                 onClick = {
                                     onShowMenuChange(false)
-                                    onBlockUser?.invoke(item)
+                                    onBlockTopic(topic.id, topic.name)
                                 },
                             )
-                            if (onBlockTopic != null && item.raw != null) {
-                                val topics = when (val raw = item.raw) {
-                                    is com.github.zly2006.zhihu.data.DataHolder.Answer -> raw.question.topics
-                                    is com.github.zly2006.zhihu.data.DataHolder.Question -> raw.topics
-                                    is com.github.zly2006.zhihu.data.DataHolder.Article -> raw.topics ?: emptyList()
-                                    else -> emptyList()
-                                }
-                                topics.forEach { topic ->
-                                    DropdownMenuItem(
-                                        text = { Text("屏蔽「${topic.name}」") },
-                                        onClick = {
-                                            onShowMenuChange(false)
-                                            onBlockTopic(topic.id, topic.name)
-                                        },
-                                    )
-                                }
-                            }
-                            DropdownMenuItem(
-                                text = { Text("外观设置") },
-                                onClick = {
-                                    onShowMenuChange(false)
-                                    navigator.onNavigate(Account.AppearanceSettings())
-                                },
-                            )
-                            if (item.isFiltered) {
-                                DropdownMenuItem(
-                                    text = { Text("不再屏蔽低赞内容") },
-                                    onClick = {
-                                        onShowMenuChange(false)
-                                        navigator.onNavigate(Account.RecommendSettings("enableQualityFilter"))
-                                    },
-                                )
-                            }
                         }
+                    }
+                    DropdownMenuItem(
+                        text = { Text("外观设置") },
+                        onClick = {
+                            onShowMenuChange(false)
+                            navigator.onNavigate(Account.AppearanceSettings())
+                        },
+                    )
+                    if (item.isFiltered) {
+                        DropdownMenuItem(
+                            text = { Text("不再屏蔽低赞内容") },
+                            onClick = {
+                                onShowMenuChange(false)
+                                navigator.onNavigate(Account.RecommendSettings("enableQualityFilter"))
+                            },
+                        )
                     }
                 }
             }
-        }
-
-        if (!thumbnailUrl.isNullOrEmpty() && showFeedThumbnail) {
-            Spacer(modifier = Modifier.width(8.dp))
-            AsyncImage(
-                model = thumbnailUrl,
-                contentDescription = "Thumbnail",
-                modifier = Modifier
-                    .weight(1f)
-                    .sizeIn(maxWidth = 60.dp)
-                    .clip(RoundedCornerShape(8.dp)),
-            )
+            
+            if (!thumbnailUrl.isNullOrEmpty() && showFeedThumbnail) {
+                Spacer(modifier = Modifier.width(8.dp))
+                AsyncImage(
+                    model = thumbnailUrl,
+                    contentDescription = "Thumbnail",
+                    modifier = Modifier
+                        .size(60.dp, 60.dp)
+                        .clip(RoundedCornerShape(8.dp)),
+                )
+            }
         }
     }
 }

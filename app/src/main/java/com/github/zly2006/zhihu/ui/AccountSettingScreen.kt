@@ -166,7 +166,7 @@ fun AccountSettingScreen(
                 }
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End,
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     val scanActivityLauncher = rememberLauncherForActivityResult(
                         contract = ActivityResultContracts.StartActivityForResult(),
@@ -185,24 +185,31 @@ fun AccountSettingScreen(
                             }
                         }
                     }
-                    FilledTonalIconButton(
-                        onClick = {
-                            val intent = Intent(context, QRCodeScanActivity::class.java)
-                            scanActivityLauncher.launch(intent)
-                        },
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.QrCodeScanner,
-                            contentDescription = "扫码登录",
-                        )
+                    
+                    val showLoginButtons = remember {
+                        preferences.getBoolean("showQrLoginButtons", false)
                     }
+                    
+                    if (showLoginButtons) {
+                        FilledTonalIconButton(
+                            onClick = {
+                                val intent = Intent(context, QRCodeScanActivity::class.java)
+                                scanActivityLauncher.launch(intent)
+                            },
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.QrCodeScanner,
+                                contentDescription = "扫码登录",
+                            )
+                        }
 
-                    FilledTonalIconButton(
-                        onClick = {
-                            AccountData.delete(context)
-                        },
-                    ) {
-                        Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = "退出登录")
+                        FilledTonalIconButton(
+                            onClick = {
+                                AccountData.delete(context)
+                            },
+                        ) {
+                            Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = "退出登录")
+                        }
                     }
                 }
             }

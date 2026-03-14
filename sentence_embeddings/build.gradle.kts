@@ -36,7 +36,10 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlinOptions { jvmTarget = "11" }
+    kotlinOptions { 
+        @Suppress("DEPRECATION")
+        jvmTarget = "11" 
+    }
 
     androidResources {
         noCompress += "onnx"

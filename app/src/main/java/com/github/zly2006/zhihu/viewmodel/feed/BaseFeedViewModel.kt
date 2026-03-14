@@ -23,6 +23,8 @@ import com.github.zly2006.zhihu.data.target
 import com.github.zly2006.zhihu.ui.PREFERENCE_NAME
 import com.github.zly2006.zhihu.viewmodel.PaginationViewModel
 import com.github.zly2006.zhihu.viewmodel.filter.BlocklistManager
+import com.github.zly2006.zhihu.viewmodel.filter.ContentFilterExtensions
+import com.github.zly2006.zhihu.viewmodel.filter.ContentType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -49,7 +51,21 @@ abstract class BaseFeedViewModel : PaginationViewModel<Feed>(typeOf<Feed>()) {
 
     override fun processResponse(context: Context, data: List<Feed>, rawData: JsonArray) {
         super.processResponse(context, data, rawData)
-        displayItems.addAll(data.flatten().map { createDisplayItem(context, it) }) // 展示用的已flatten数据
+        
+        viewModelScope.launch {
+            val newItems = data.flatten().map { createDisplayItem(context, it) }
+            
+            // 应用内容过滤
+            val filteredItems = ContentFilterExtensions.applyContentFilterToDisplayItems(context, newItems)
+            
+            // 记录内容展示
+            recordContentDisplays(context, filteredItems)
+            
+            // 更新 displayItems
+            withContext(Dispatchers.Main) {
+                displayItems.addAll(filteredItems)
+            }
+        }
     }
 
     override fun refresh(context: Context) {
@@ -270,6 +286,50 @@ abstract class BaseFeedViewModel : PaginationViewModel<Feed>(typeOf<Feed>()) {
             } catch (e: Exception) {
                 val message = "屏蔽失败: ${e.message}"
                 Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    /**
+     * 记录内容展示
+     */
+    protected open suspend fun recordContentDisplays(context: Context, items: List<FeedDisplayItem>) {
+        withContext(Dispatchers.IO) {
+            try {
+                items.forEach { item ->
+                    when (val dest = item.navDestination) {
+                        is com.github.zly2006.zhihu.Article -> {
+                            val contentType = when (dest.type) {
+                                com.github.zly2006.zhihu.ArticleType.Answer -> ContentType.ANSWER
+                                com.github.zly2006.zhihu.ArticleType.Article -> ContentType.ARTICLE
+                            }
+                            ContentFilterExtensions.recordContentDisplay(
+                                context,
+                                contentType,
+                                dest.id.toString(),
+                            )
+                        }
+                        is com.github.zly2006.zhihu.Question -> {
+                            ContentFilterExtensions.recordContentDisplay(
+                                context,
+                                ContentType.QUESTION,
+                                dest.questionId.toString(),
+                            )
+                        }
+                        is com.github.zly2006.zhihu.Pin -> {
+                            ContentFilterExtensions.recordContentDisplay(
+                                context,
+                                ContentType.PIN,
+                                dest.id.toString(),
+                            )
+                        }
+                        else -> {
+                            // 其他类型暂不处理
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("BaseFeedViewModel", "Failed to record content displays", e)
             }
         }
     }

@@ -148,8 +148,8 @@ object ContentFilterExtensions {
     }
 
     /**
-     * 对FeedDisplayItem列表应用内容过滤
-     * 包括广告检测、关键词屏蔽、NLP语义屏蔽和用户屏蔽
+     * 对 FeedDisplayItem 列表应用内容过滤
+     * 包括广告检测、关键词屏蔽、NLP 语义屏蔽和用户屏蔽
      */
     suspend fun applyContentFilterToDisplayItems(
         context: Context,
@@ -159,6 +159,10 @@ object ContentFilterExtensions {
             val preferences = context.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
 
             var filteredItems = items
+
+            // 0. 首先过滤掉已经被标记为已过滤的项（质量过滤规则）
+            val (qualityFiltered, nonQualityFiltered) = filteredItems.partition { it.isFiltered }
+            filteredItems = nonQualityFiltered
 
             // 1. 应用关注用户过滤逻辑
             val shouldFilterFollowed = preferences.getBoolean("filterFollowedUserContent", false)
@@ -175,7 +179,7 @@ object ContentFilterExtensions {
                 Pair(emptyList(), filteredItems)
             }
 
-            // 2. 转换为FilterableContent并获取完整内容，同时建立映射关系
+            // 2. 转换为 FilterableContent 并获取完整内容，同时建立映射关系
             val itemToFilterableMap = mutableMapOf<FeedDisplayItem, FilterableContent>()
 
             otherItems.forEach { item ->
@@ -307,11 +311,16 @@ object ContentFilterExtensions {
             "data-edu-card-id", // 知乎学堂
             "mp.weixin.qq.com", // 微信公众号文章链接，常见于被推广的内容中
         )
+        
+        // 检查标题和摘要中是否包含"广告"字样
+        val isExplicitAd = content.title.contains("广告", ignoreCase = true) ||
+            content.summary?.contains("广告", ignoreCase = true) == true
+        
         return when (val raw = content.raw) {
-            is DataHolder.Answer -> blocklist.any { blockWord -> blockWord in raw.content } || raw.paidInfo != null
-            is DataHolder.Article -> blocklist.any { blockWord -> blockWord in raw.content } || raw.paidInfo != null
-            is DataHolder.Pin -> blocklist.any { blockWord -> blockWord in raw.contentHtml }
-            else -> false
+            is DataHolder.Answer -> blocklist.any { blockWord -> blockWord in raw.content } || raw.paidInfo != null || isExplicitAd
+            is DataHolder.Article -> blocklist.any { blockWord -> blockWord in raw.content } || raw.paidInfo != null || isExplicitAd
+            is DataHolder.Pin -> blocklist.any { blockWord -> blockWord in raw.contentHtml } || isExplicitAd
+            else -> isExplicitAd
         }
     }
 
