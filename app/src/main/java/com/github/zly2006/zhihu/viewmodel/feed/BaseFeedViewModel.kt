@@ -154,8 +154,16 @@ abstract class BaseFeedViewModel : PaginationViewModel<Feed>(typeOf<Feed>()) {
             isFiltered = true,
         )
 
-        is GroupFeed -> error("GroupFeed should not be flatten") // GroupFeed will be handled in the UI
+        is GroupFeed -> error("GroupFeed should be flatten") // GroupFeed will be handled in the UI
         is QuestionFeedCard -> TODO()
+    }
+
+    fun addDisplayItems(newItems: List<FeedDisplayItem>) {
+        newItems.forEach {
+            if (displayItems.none { existing -> existing.navDestination == it.navDestination }) {
+                displayItems.add(it)
+            }
+        }
     }
 
     @Suppress("NOTHING_TO_INLINE")

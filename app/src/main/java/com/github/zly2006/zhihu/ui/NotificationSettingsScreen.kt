@@ -2,6 +2,7 @@ package com.github.zly2006.zhihu.ui
 
 import android.content.Context
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -79,7 +80,9 @@ object NotificationPreferences {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NotificationSettingsScreen() {
+fun NotificationSettingsScreen(
+    innerPadding: PaddingValues,
+) {
     val navigator = LocalNavigator.current
     val context = LocalContext.current
 
@@ -100,6 +103,7 @@ fun NotificationSettingsScreen() {
     }
 
     Scaffold(
+        modifier = Modifier.padding(innerPadding),
         topBar = {
             TopAppBar(
                 title = { Text("通知设置") },
@@ -114,11 +118,11 @@ fun NotificationSettingsScreen() {
                 windowInsets = WindowInsets(0.dp),
             )
         },
-    ) { paddingValues ->
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp),
         ) {
