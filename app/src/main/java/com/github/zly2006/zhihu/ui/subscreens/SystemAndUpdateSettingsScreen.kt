@@ -254,7 +254,7 @@ fun SystemAndUpdateSettingsScreen(
 
             ListItem(
                 headlineContent = { Text("Telegram 群组 (Hydrogen)") },
-                supportingContent = { Text("另一个知乎客户端 Hydrogen 的群组，也可以在里面讨论知乎++哦") },
+                supportingContent = { Text("另一个知乎客户端 Hydrogen 的群组，也可以在里面讨论知乎·简悦哦") },
                 trailingContent = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null) },
                 modifier = Modifier.clickable { luoTianYiUrlLauncher(context, "https://t.me/+_A1Yto6EpyIyODA1".toUri()) },
             )
