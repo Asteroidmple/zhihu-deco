@@ -52,7 +52,10 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -90,6 +93,7 @@ import com.github.zly2006.zhihu.Pin
 import com.github.zly2006.zhihu.Question
 import com.github.zly2006.zhihu.Search
 import com.github.zly2006.zhihu.SentenceSimilarityTest
+import com.github.zly2006.zhihu.TopLevelDestination
 import com.github.zly2006.zhihu.theme.ZhihuTheme
 import com.github.zly2006.zhihu.ui.subscreens.AppearanceSettingsScreen
 import com.github.zly2006.zhihu.ui.subscreens.BlockedFeedHistoryScreen
@@ -281,7 +285,9 @@ fun ZhihuMain(modifier: Modifier = Modifier, navController: NavHostController) {
     }
 
     Scaffold(
-        modifier = Modifier.nestedScroll(bottomBarScrollConnection),
+        modifier = modifier
+            .nestedScroll(bottomBarScrollConnection)
+            .semantics { testTagsAsResourceId = true },
         bottomBar = {
             val navEntry by navController.currentBackStackEntryAsState()
             if (navEntry != null) {
@@ -328,6 +334,7 @@ fun ZhihuMain(modifier: Modifier = Modifier, navController: NavHostController) {
                             label: String,
                             icon: androidx.compose.ui.graphics.vector.ImageVector,
                         ) {
+                            val tag = "nav_tab_${(destination as? TopLevelDestination)?.name?.lowercase() ?: label.lowercase()}"
                             NavigationBarItem(
                                 navEntry.hasRoute(destination::class),
                                 onClick = {
@@ -366,7 +373,7 @@ fun ZhihuMain(modifier: Modifier = Modifier, navController: NavHostController) {
                                 icon = {
                                     Icon(icon, contentDescription = label)
                                 },
-                                modifier = if (duo3NavStyle) Modifier.padding(top = 4.dp) else Modifier,
+                                modifier = (if (duo3NavStyle) Modifier.padding(top = 4.dp) else Modifier).testTag(tag),
                             )
                         }
 
