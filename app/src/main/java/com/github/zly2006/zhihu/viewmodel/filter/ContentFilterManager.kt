@@ -32,40 +32,6 @@ class ContentFilterManager private constructor(
     }
 
     /**
-     * 记录内容展示
-     */
-    suspend fun recordContentView(targetType: String, targetId: String) {
-        withContext(Dispatchers.IO) {
-            val recordId = ContentViewRecord.generateId(targetType, targetId)
-            val existingRecord = dao.getViewRecord(recordId)
-
-            if (existingRecord != null) {
-                // 更新现有记录
-                dao.incrementViewCount(recordId)
-            } else {
-                // 创建新记录
-                val newRecord = ContentViewRecord(
-                    id = recordId,
-                    targetType = targetType,
-                    targetId = targetId,
-                    viewCount = 1,
-                )
-                dao.insertOrUpdateViewRecord(newRecord)
-            }
-        }
-    }
-
-    /**
-     * 记录用户交互（点击、点赞等）
-     */
-    suspend fun recordContentInteraction(targetType: String, targetId: String) {
-        withContext(Dispatchers.IO) {
-            val recordId = ContentViewRecord.generateId(targetType, targetId)
-            dao.markAsInteracted(recordId)
-        }
-    }
-
-    /**
      * 批量检查内容是否已被查看过
      */
     suspend fun getAlreadyViewedContentIds(content: List<Pair<String, String>>): Set<String> = withContext(Dispatchers.IO) {

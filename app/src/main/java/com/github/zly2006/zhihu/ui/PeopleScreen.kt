@@ -57,7 +57,10 @@ import com.github.zly2006.zhihu.Person
 import com.github.zly2006.zhihu.Pin
 import com.github.zly2006.zhihu.Question
 import com.github.zly2006.zhihu.data.AccountData
+import com.github.zly2006.zhihu.data.CommonFeed
 import com.github.zly2006.zhihu.data.DataHolder
+import com.github.zly2006.zhihu.data.Feed
+import com.github.zly2006.zhihu.data.Person as DataPerson
 import com.github.zly2006.zhihu.ui.components.FeedCard
 import com.github.zly2006.zhihu.ui.components.OpenImageDislog
 import com.github.zly2006.zhihu.ui.components.PaginatedList
@@ -496,6 +499,11 @@ fun PeopleScreen(
                         Column(
                             modifier = Modifier.fillMaxSize(),
                         ) {
+                            LaunchedEffect(viewModel.answersFeedModel.errorMessage) {
+                                viewModel.answersFeedModel.errorMessage?.let {
+                                    Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+                                }
+                            }
                             SortBar(
                                 currentSort = viewModel.answersFeedModel.sortBy,
                                 onSortChange = { newSort ->
@@ -514,7 +522,32 @@ fun PeopleScreen(
                                         title = it.question.title,
                                         summary = it.excerpt,
                                         details = "回答 · ${it.voteupCount} 赞同 · ${it.commentCount} 评论",
-                                        feed = null,
+                                        feed = CommonFeed(
+                                            id = "people_${it.id}",
+                                            verb = "PEOPLE_ANSWER",
+                                            target = Feed.AnswerTarget(
+                                                id = it.id,
+                                                url = "https://www.zhihu.com/answer/${it.id}",
+                                                author = null,
+                                                createdTime = -1,
+                                                updatedTime = -1,
+                                                voteupCount = it.voteupCount,
+                                                thanksCount = -1,
+                                                commentCount = it.commentCount,
+                                                isCopyable = false,
+                                                question = Feed.QuestionTarget(
+                                                    id = it.question.id,
+                                                    _title = it.question.title,
+                                                    url = "",
+                                                    type = "question",
+                                                    answerCount = 0,
+                                                    commentCount = 0,
+                                                    followerCount = 0,
+                                                    isFollowing = false,
+                                                ),
+                                                excerpt = it.excerpt,
+                                            ),
+                                        ),
                                     ),
                                     horizontalPadding = 4.dp,
                                 ) {
@@ -536,6 +569,11 @@ fun PeopleScreen(
                         Column(
                             modifier = Modifier.fillMaxSize(),
                         ) {
+                            LaunchedEffect(viewModel.articlesFeedModel.errorMessage) {
+                                viewModel.articlesFeedModel.errorMessage?.let {
+                                    Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+                                }
+                            }
                             SortBar(
                                 currentSort = viewModel.articlesFeedModel.sortBy,
                                 onSortChange = { newSort ->
@@ -554,7 +592,39 @@ fun PeopleScreen(
                                         title = it.title,
                                         summary = it.excerpt,
                                         details = "文章 · ${it.voteupCount} 赞同 · ${it.commentCount} 评论",
-                                        feed = null,
+                                        feed = CommonFeed(
+                                            id = "people_${it.id}",
+                                            verb = "PEOPLE_ARTICLE",
+                                            target = Feed.ArticleTarget(
+                                                id = it.id,
+                                                url = "https://zhuanlan.zhihu.com/p/${it.id}",
+                                                author = DataPerson(
+                                                    id = "",
+                                                    url = "",
+                                                    userType = "",
+                                                    urlToken = "",
+                                                    name = "",
+                                                    headline = "",
+                                                    avatarUrl = "",
+                                                    isOrg = false,
+                                                    gender = 0,
+                                                    followersCount = 0,
+                                                    isFollowing = false,
+                                                    isFollowed = false,
+                                                    badge = null,
+                                                ),
+                                                voteupCount = it.voteupCount,
+                                                commentCount = it.commentCount,
+                                                title = it.title,
+                                                excerpt = it.excerpt,
+                                                content = "",
+                                                created = -1,
+                                                updated = 0,
+                                                isLabeled = false,
+                                                visitedCount = 0,
+                                                favoriteCount = 0,
+                                            ),
+                                        ),
                                     ),
                                     horizontalPadding = 4.dp,
                                 ) {
@@ -614,13 +684,57 @@ fun PeopleScreen(
 
                     5 -> {
                         // 想法
-                        PaginatedList(
-                            items = viewModel.pinsFeedModel.allData,
-                            onLoadMore = { viewModel.pinsFeedModel.loadMore(context) },
-                            isEnd = { viewModel.pinsFeedModel.isEnd },
-                            footer = ProgressIndicatorFooter,
-                        ) { pin ->
-                            PinListItem(pin)
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                        ) {
+                            LaunchedEffect(viewModel.pinsFeedModel.errorMessage) {
+                                viewModel.pinsFeedModel.errorMessage?.let {
+                                    Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+                                }
+                            }
+                            PaginatedList(
+                                items = viewModel.pinsFeedModel.allData,
+                                onLoadMore = { viewModel.pinsFeedModel.loadMore(context) },
+                                isEnd = { viewModel.pinsFeedModel.isEnd },
+                                footer = ProgressIndicatorFooter,
+                            ) { pin ->
+                                FeedCard(
+                                    BaseFeedViewModel.FeedDisplayItem(
+                                        title = "想法",
+                                        summary = pin.excerptTitle,
+                                        details = "${pin.likeCount} 赞 · ${pin.commentCount} 评论",
+                                        feed = CommonFeed(
+                                            id = "people_pin_${pin.id}",
+                                            verb = "PEOPLE_PIN",
+                                            target = Feed.PinTarget(
+                                                id = pin.id.toLongOrNull() ?: 0,
+                                                url = "https://www.zhihu.com/pin/${pin.id}",
+                                                author = DataPerson(
+                                                    id = "",
+                                                    url = "",
+                                                    userType = "",
+                                                    urlToken = "",
+                                                    name = "",
+                                                    headline = "",
+                                                    avatarUrl = "",
+                                                    isOrg = false,
+                                                    gender = 0,
+                                                    followersCount = 0,
+                                                    isFollowing = false,
+                                                    isFollowed = false,
+                                                    badge = null,
+                                                ),
+                                                commentCount = pin.commentCount,
+                                                content = kotlinx.serialization.json.JsonArray(emptyList()),
+                                                likeCount = pin.likeCount,
+                                            ),
+                                        ),
+                                    ),
+                                    horizontalPadding = 4.dp,
+                                ) {
+                                    navigator.onNavigate(Pin(pin.id.toLongOrNull() ?: 0))
+                                }
+                            }
                         }
                     }
 

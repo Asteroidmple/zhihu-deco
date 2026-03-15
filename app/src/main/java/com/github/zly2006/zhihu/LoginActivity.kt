@@ -27,6 +27,8 @@ class LoginActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdgeCompat()
 
+        var webViewLoaded = false
+
         setContent {
             val scope = rememberCoroutineScope()
             Surface(
@@ -35,11 +37,24 @@ class LoginActivity : ComponentActivity() {
                     .systemBarsPadding(),
             ) {
                 WebviewComp(
+                    modifier = Modifier.fillMaxSize(),
+                    useContentHeight = false, // 登录页面使用固定全屏大小
                     onLoad = { webView ->
-                        webView.setupUpWebviewClient()
+                        if (webViewLoaded) return@WebviewComp
+                        webViewLoaded = true
+                        
                         @SuppressLint("SetJavaScriptEnabled")
                         webView.settings.javaScriptEnabled = true
+                        webView.settings.domStorageEnabled = true
+                        
+                        // 先调用 setupUpWebviewClient 设置基础配置
+                        webView.setupUpWebviewClient()
+                        
+                        // 清除所有 cookies
                         CookieManager.getInstance().removeAllCookies { }
+                        CookieManager.getInstance().setAcceptThirdPartyCookies(webView, true)
+                        
+                        // 设置自定义 WebViewClient
                         webView.webViewClient = object : WebViewClient() {
                             override fun shouldOverrideUrlLoading(
                                 view: WebView?,
@@ -56,7 +71,7 @@ class LoginActivity : ComponentActivity() {
 
                             override fun onPageFinished(view: WebView?, url: String?) {
                                 super.onPageFinished(view, url)
-                                if (url == "https://www.zhihu.com/") {
+                                if (url == "https://www.zhihu.com/" || url == "https://www.zhihu.com/signin") {
                                     val cookies =
                                         CookieManager
                                             .getInstance()
@@ -106,7 +121,7 @@ class LoginActivity : ComponentActivity() {
                                 }
                             }
                         }
-                        CookieManager.getInstance().setAcceptThirdPartyCookies(webView, true)
+                        // 加载登录页面
                         webView.loadUrl("https://www.zhihu.com/signin")
                     },
                 )

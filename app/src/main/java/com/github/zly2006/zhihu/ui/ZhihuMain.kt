@@ -105,8 +105,6 @@ import com.github.zly2006.zhihu.viewmodel.ArticleViewModel
 import kotlin.reflect.KClass
 import com.github.zly2006.zhihu.ui.NavHost as MyNavHost
 
-const val SURVEY_URL = "https://v.wjx.cn/vm/Ppfw2R4.aspx#"
-
 @SuppressLint("RestrictedApi")
 @Composable
 fun ZhihuMain(modifier: Modifier = Modifier, navController: NavHostController) {
@@ -114,21 +112,6 @@ fun ZhihuMain(modifier: Modifier = Modifier, navController: NavHostController) {
     val activity = LocalActivity.current as MainActivity
     val context = LocalContext.current
     val preferences = remember { context.getSharedPreferences(PREFERENCE_NAME, android.content.Context.MODE_PRIVATE) }
-
-    val keySurveyDone = "survey_feedback_done"
-    var showSurveyDialog by remember { mutableStateOf(false) }
-    LaunchedEffect(Unit) {
-        if (!preferences.getBoolean(keySurveyDone, false)) {
-            val installTime = try {
-                context.packageManager.getPackageInfo(context.packageName, 0).firstInstallTime
-            } catch (_: Exception) {
-                System.currentTimeMillis()
-            }
-            if (System.currentTimeMillis() - installTime >= 3 * 60 * 60 * 1000L) {
-                showSurveyDialog = true
-            }
-        }
-    }
 
     // 首次启动提示
     var showFilterExplainDialog by remember {
@@ -152,35 +135,6 @@ fun ZhihuMain(modifier: Modifier = Modifier, navController: NavHostController) {
                     showFilterExplainDialog = false
                 }) {
                     Text("好")
-                }
-            },
-        )
-    }
-    if (showSurveyDialog) {
-        AlertDialog(
-            onDismissRequest = { showSurveyDialog = false },
-            title = { Text("希望听到您的声音") },
-            text = {
-                Text("我们诚挚地邀请您填写一份简短的调查问卷，帮助我们了解您的使用体验和需求，以便为您带来更好的产品。只需 1~2 分钟，非常感谢您的支持！")
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    showSurveyDialog = false
-                    preferences.edit { putBoolean(keySurveyDone, true) }
-                    val intent = Intent(
-                        Intent.ACTION_VIEW,
-                        SURVEY_URL.toUri(),
-                    )
-                    context.startActivity(intent)
-                }) { Text("去填写") }
-            },
-            dismissButton = {
-                androidx.compose.foundation.layout.Row {
-                    TextButton(onClick = { showSurveyDialog = false }) { Text("取消") }
-                    TextButton(onClick = {
-                        showSurveyDialog = false
-                        preferences.edit { putBoolean(keySurveyDone, true) }
-                    }) { Text("我已填写") }
                 }
             },
         )

@@ -98,40 +98,6 @@ object ContentFilterExtensions {
     }
 
     /**
-     * 在内容显示时记录展示次数
-     * 建议在RecyclerView的onBindViewHolder或Compose的LaunchedEffect中调用
-     */
-    suspend fun recordContentDisplay(context: Context, targetType: String, targetId: String) {
-        if (!isContentFilterEnabled(context)) return
-
-        withContext(Dispatchers.IO) {
-            try {
-                val filterManager = ContentFilterManager.getInstance(context)
-                filterManager.recordContentView(targetType, targetId)
-            } catch (e: Exception) {
-                Log.e("ContentFilterExtensions", "Failed to record content display", e)
-            }
-        }
-    }
-
-    /**
-     * 在用户与内容交互时记录交互行为
-     * 建议在用户点击、点赞、评论等操作时调用
-     */
-    suspend fun recordContentInteraction(context: Context, targetType: String, targetId: String) {
-        if (!isContentFilterEnabled(context)) return
-
-        withContext(Dispatchers.IO) {
-            try {
-                val filterManager = ContentFilterManager.getInstance(context)
-                filterManager.recordContentInteraction(targetType, targetId)
-            } catch (e: Exception) {
-                Log.e("ContentFilterExtensions", "Failed to record content interaction", e)
-            }
-        }
-    }
-
-    /**
      * 定期清理过期数据（建议在应用启动时调用）
      */
     suspend fun performMaintenanceCleanup(context: Context) {

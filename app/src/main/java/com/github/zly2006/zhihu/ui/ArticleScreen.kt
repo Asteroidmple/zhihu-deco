@@ -62,7 +62,6 @@ import androidx.compose.material.icons.filled.GetApp
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.SkipNext
-import androidx.compose.material.icons.outlined.DesktopWindows
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -427,20 +426,6 @@ fun ArticleActionsMenu(
             onClick = {
                 onDismissRequest()
                 onExportRequest()
-            },
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        MenuActionButton(
-            icon = Icons.Outlined.DesktopWindows,
-            text = "在电脑中打开（我计划使用浏览器插件实现，还在写，点击后请手动前往收藏夹打开）",
-            onClick = {
-                coroutineScope.launch {
-                    OpenInBrowser.openUrlInBrowser(context, article)
-                    onDismissRequest()
-                    Toast.makeText(context, "已发送到浏览器", Toast.LENGTH_SHORT).show()
-                }
             },
         )
 
@@ -1885,11 +1870,13 @@ fun ArticleScreen(
         context = context,
     )
 
-    viewModel.httpClient?.let {
+    // 评论组件 - 使用 context 中的 httpClient 作为备用
+    val httpClient = viewModel.httpClient ?: (context as? MainActivity)?.httpClient
+    if (httpClient != null) {
         CommentScreenComponent(
             showComments = showComments,
             onDismiss = { showComments = false },
-            httpClient = it,
+            httpClient = httpClient,
             content = article,
         )
     }

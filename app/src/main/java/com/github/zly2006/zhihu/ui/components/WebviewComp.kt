@@ -512,6 +512,7 @@ fun WebviewComp(
     modifier: Modifier = Modifier.fillMaxSize(),
     scrollState: ScrollState? = null,
     existingWebView: CustomWebView? = null,
+    useContentHeight: Boolean = true, // 是否根据内容高度调整 WebView 高度
     onLoad: (CustomWebView) -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -552,10 +553,10 @@ fun WebviewComp(
             view.onPageStartedCallback = { coroutineScope.launch(Dispatchers.Main) { contentHeightDp = 0 } }
             onLoad(view)
         },
-        modifier = if (contentHeightDp > 0) {
+        modifier = if (useContentHeight && contentHeightDp > 0) {
             modifier.height(contentHeightDp.dp)
         } else {
-            modifier.wrapContentSize()
+            modifier
         },
         onRelease = { frameLayout ->
             val view = frameLayout.getChildAt(0) as? CustomWebView ?: return@AndroidView
@@ -646,6 +647,12 @@ fun WebView.setupUpWebviewClient(onPageFinished: ((String) -> Unit)? = null) {
                 url.contains(".svg", true)
             ) {
                 Log.i("WebView-Image", "Loading image: $url")
+            }
+
+            // 拦截跟踪器和统计脚本
+            if (isTrackerUrl(url)) {
+                Log.d("WebView-Tracker", "Blocked tracker: $url")
+                return createEmptyResponse()
             }
 
             if (request.url.host == "www.zhihu.com" && request.url.path == "/equation") {
@@ -752,4 +759,157 @@ fun WebView.setupUpWebviewClient(onPageFinished: ((String) -> Unit)? = null) {
             onPageFinished?.invoke(url)
         }
     }
+}
+
+/**
+ * 检查 URL 是否为跟踪器或统计脚本
+ */
+private fun isTrackerUrl(url: String): Boolean {
+    // 知乎自身的跟踪和统计域名
+    val trackerDomains = listOf(
+        // 知乎统计和跟踪
+        "zhihu.com-analytics",
+        "analytics.zhihu.com",
+        "tracking.zhihu.com",
+        "telemetry.zhihu.com",
+        "stats.zhihu.com",
+        "log.zhihu.com",
+        "logs.zhihu.com",
+        
+        // 知乎埋点相关
+        "oa.zhihu.com",
+        "zhihu-web-analytics.zhihu.com",
+        
+        // 第三方统计和广告跟踪
+        "google-analytics.com",
+        "www.google-analytics.com",
+        "stats.g.doubleclick.net",
+        "googleadservices.com",
+        "googletagmanager.com",
+        "googletagservices.com",
+        
+        //  Facebook Pixel
+        "facebook.com/tr",
+        "connect.facebook.net",
+        
+        // 其他常见跟踪器
+        "hotjar.com",
+        "crazyegg.com",
+        "fullstory.com",
+        "mixpanel.com",
+        "segment.com",
+        "amplitude.com",
+        
+        // 百度统计
+        "hm.baidu.com",
+        "cpro.baidu.com",
+        
+        // 腾讯分析
+        "tajs.qq.com",
+        
+        // 阿里妈妈
+        "alimama.com",
+        "tanx.com",
+        
+        // 秒针系统
+        "miaozhen.com",
+        
+        // 友盟
+        "umeng.com",
+        "umtrack.com",
+        
+        // GrowingIO
+        "growingio.com",
+        
+        // 神策数据
+        "sensorsdata.cn",
+        "sensors-dataprocessing.cn",
+    )
+    
+    // 跟踪器路径关键词
+    val trackerPaths = listOf(
+        "/analytics/",
+        "/tracking/",
+        "/telemetry/",
+        "/log/",
+        "/logs/",
+        "/beacon/",
+        "/beacons/",
+        "/pixel/",
+        "/pixels/",
+        "/track/",
+        "/tracker/",
+        "/trackers/",
+        "/stats/",
+        "/statistics/",
+        "/collect/",
+        "/report/",
+        "/metrics/",
+        "/metric/",
+        "/data-collection/",
+        "/event-reporting/",
+        "analytics.js",
+        "tracking.js",
+        "telemetry.js",
+        "analytics.min.js",
+        "tracking.min.js",
+        "beacon.js",
+        "pixel.js",
+        "tracker.js",
+        "stats.js",
+        "collect.js",
+        "report.js",
+        "metrics.js",
+        "log.gif",
+        "tracking.gif",
+        "pixel.gif",
+        "beacon.gif",
+        "analytics.gif",
+        "track.gif",
+        "report.gif",
+    )
+    
+    // 检查域名
+    for (domain in trackerDomains) {
+        if (url.contains(domain, ignoreCase = true)) {
+            return true
+        }
+    }
+    
+    // 检查路径
+    for (path in trackerPaths) {
+        if (url.contains(path, ignoreCase = true)) {
+            return true
+        }
+    }
+    
+    // 检查埋点请求特征
+    if (url.contains("event=", ignoreCase = true) && 
+        (url.contains("track", ignoreCase = true) || 
+         url.contains("beacon", ignoreCase = true) ||
+         url.contains("log", ignoreCase = true))) {
+        return true
+    }
+    
+    // 检查知乎自身的埋点 API
+    if (url.contains("zhihu.com") && 
+        (url.contains("/api/v4/track", ignoreCase = true) ||
+         url.contains("/api/v4/analytics", ignoreCase = true) ||
+         url.contains("/web-analytics", ignoreCase = true) ||
+         url.contains("action=", ignoreCase = true) && url.contains("target=", ignoreCase = true))) {
+        return true
+    }
+    
+    return false
+}
+
+/**
+ * 创建空响应以阻止跟踪器加载
+ */
+private fun createEmptyResponse(): WebResourceResponse {
+    return WebResourceResponse(
+        "text/plain",
+        "UTF-8",
+        "".byteInputStream()
+    )
 }

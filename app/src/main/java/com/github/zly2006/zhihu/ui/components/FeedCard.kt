@@ -50,10 +50,12 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -63,6 +65,9 @@ import coil3.compose.AsyncImage
 import com.github.zly2006.zhihu.Account
 import com.github.zly2006.zhihu.BuildConfig
 import com.github.zly2006.zhihu.LocalNavigator
+import com.github.zly2006.zhihu.data.Feed
+import com.github.zly2006.zhihu.data.target
+import com.github.zly2006.zhihu.viewmodel.feed.BaseFeedViewModel.FeedDisplayItem
 import com.github.zly2006.zhihu.theme.ThemeManager
 import com.github.zly2006.zhihu.ui.PREFERENCE_NAME
 import com.github.zly2006.zhihu.util.parseHtmlTextWithTheme
@@ -424,6 +429,16 @@ private fun FeedCardContent(
         // ── 新排版（duo3）────────────────────────────────────────────────────
         if (!item.title.isEmpty()) {
             Row(verticalAlignment = Alignment.CenterVertically) {
+                // 内容类型标签
+                val tagInfo = getTagInfo(item.feed, item)
+                Text(
+                    text = tagInfo.text,
+                    fontSize = 12.sp,
+                    color = Color.White,
+                    modifier = Modifier
+                        .padding(end = 6.dp)
+                        .background(tagInfo.backgroundColor, RoundedCornerShape(4.dp)),
+                )
                 Text(
                     text = parseHtmlTextWithTheme(item.title),
                     style = MaterialTheme.typography.titleLarge,
@@ -495,8 +510,8 @@ private fun FeedCardContent(
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.weight(1f),
                         )
-                        FeedCardMenuBox(item, showMenu, onShowMenuChange, onBlockUser, onBlockByKeywords, onBlockTopic, navigator)
                     }
+                    FeedCardMenuBox(item, showMenu, onShowMenuChange, onBlockUser, onBlockByKeywords, onBlockTopic, navigator)
                 }
             }
         }
@@ -504,6 +519,16 @@ private fun FeedCardContent(
         // ── 原始排版（master）────────────────────────────────────────────────
         if (!item.title.isEmpty() && !item.isFiltered) {
             Row(verticalAlignment = Alignment.CenterVertically) {
+                // 内容类型标签
+                val tagInfo = getTagInfo(item.feed, item)
+                Text(
+                    text = tagInfo.text,
+                    fontSize = 12.sp,
+                    color = Color.White,
+                    modifier = Modifier
+                        .padding(end = 6.dp)
+                        .background(tagInfo.backgroundColor, RoundedCornerShape(4.dp)),
+                )
                 Text(
                     text = parseHtmlTextWithTheme(item.title),
                     fontSize = 16.sp,
@@ -565,7 +590,7 @@ private fun FeedCardContent(
                     fontSize = 12.sp,
                     lineHeight = 16.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 2,
+                    maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f),
                 )
@@ -650,6 +675,49 @@ private fun FeedCardContent(
                     .size(60.dp, 60.dp)
                     .clip(RoundedCornerShape(8.dp)),
             )
+        }
+    }
+}
+
+/**
+ * 根据 Feed 类型获取标签文本和背景颜色
+ */
+private data class TagInfo(
+    val text: String,
+    val backgroundColor: Color,
+)
+
+private fun getTagInfo(feed: Feed?, item: FeedDisplayItem): TagInfo {
+    // 首先尝试通过 feed.target 判断
+    if (feed != null) {
+        val target = feed.target
+        
+        if (target != null) {
+            // 直接使用 when 表达式检查 target 的实际类型
+            return when (target) {
+                is com.github.zly2006.zhihu.data.Feed.AnswerTarget -> TagInfo("回答", Color(0xFF0084FF))
+                is com.github.zly2006.zhihu.data.Feed.ArticleTarget -> TagInfo("文章", Color(0xFF00C853))
+                is com.github.zly2006.zhihu.data.Feed.VideoTarget -> TagInfo("视频", Color(0xFFFF6B00))
+                is com.github.zly2006.zhihu.data.Feed.PinTarget -> TagInfo("想法", Color(0xFFF1403C))
+                is com.github.zly2006.zhihu.data.Feed.QuestionTarget -> TagInfo("问题", Color(0xFF0084FF))
+                else -> TagInfo("其他", Color(0xFF8E8E93))
+            }
+        }
+    }
+    
+    // 如果 feed 或 target 为 null，使用 item.details 作为后备方案
+    val details = item.details
+    android.util.Log.d("FeedCard", "getTagInfo: feed=${feed != null}, target=${feed?.target != null}, details='$details'")
+    
+    return when (details) {
+        "回答" -> TagInfo("回答", Color(0xFF0084FF))
+        "文章" -> TagInfo("文章", Color(0xFF00C853))
+        "视频" -> TagInfo("视频", Color(0xFFFF6B00))
+        "想法" -> TagInfo("想法", Color(0xFFF1403C))
+        "问题" -> TagInfo("问题", Color(0xFF0084FF))
+        else -> {
+            android.util.Log.d("FeedCard", "getTagInfo: details='$details' -> 其他")
+            TagInfo("其他", Color(0xFF8E8E93))
         }
     }
 }

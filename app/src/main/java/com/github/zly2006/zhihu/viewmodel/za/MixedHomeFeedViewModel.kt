@@ -33,10 +33,10 @@ class MixedHomeFeedViewModel :
     }
 
     override suspend fun recordContentInteraction(context: Context, feed: Feed) {
-        web.recordContentInteraction(context, feed)
+        // 不记录交互行为
     }
 
     override fun onUiContentClick(context: Context, feed: Feed, item: FeedDisplayItem) {
-        web.onUiContentClick(context, feed, item)
+        // 不发送已读状态到服务器
     }
 }

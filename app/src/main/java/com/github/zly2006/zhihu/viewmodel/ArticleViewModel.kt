@@ -521,13 +521,13 @@ class ArticleViewModel(
                 val response = AccountData.fetchPost(context, endpoint) {
                     when (article.type) {
                         ArticleType.Answer -> setBody(mapOf("type" to newState.key))
-                        ArticleType.Article -> setBody(mapOf("voting" to if (newState == VoteUpState.Up) 1 else 0))
+                        ArticleType.Article -> setBody(mapOf("vote" to (if (newState == VoteUpState.Up) 1 else 0)))
                     }
                     contentType(ContentType.Application.Json)
                 }!!
 
                 voteUpState = newState
-                voteUpCount = response["voteup_count"]!!.jsonPrimitive.int
+                voteUpCount = response["voteup_count"]?.jsonPrimitive?.int ?: voteUpCount
             } catch (e: Exception) {
                 Log.e("ArticleViewModel", "Vote up failed", e)
                 Toast.makeText(context, "点赞失败: ${e.message}", Toast.LENGTH_SHORT).show()

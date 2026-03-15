@@ -61,9 +61,6 @@ class HomeFeedViewModel :
             val filteredItems = ContentFilterExtensions.applyContentFilterToDisplayItems(context, newItems)
             val newDestinations = filteredItems.map { it.navDestination }.toSet()
 
-            // 记录内容展示
-            recordContentDisplays(context, filteredItems)
-
             // 更新 displayItems：只添加未被过滤的条目
             withContext(Dispatchers.Main) {
                 // 移除之前加载但这次被过滤掉的条目
@@ -83,52 +80,18 @@ class HomeFeedViewModel :
 
     /**
      * 记录用户与内容的交互行为
-     * 应该在用户点击、点赞等操作时调用
+     * 已禁用，不记录任何交互
      */
     override suspend fun recordContentInteraction(context: Context, feed: Feed) {
-        withContext(Dispatchers.IO) {
-            try {
-                when (val target = feed.target) {
-                    is Feed.AnswerTarget -> {
-                        ContentFilterExtensions.recordContentInteraction(
-                            context,
-                            ContentType.ANSWER,
-                            target.id.toString(),
-                        )
-                    }
-                    is Feed.ArticleTarget -> {
-                        ContentFilterExtensions.recordContentInteraction(
-                            context,
-                            ContentType.ARTICLE,
-                            target.id.toString(),
-                        )
-                    }
-                    is Feed.QuestionTarget -> {
-                        ContentFilterExtensions.recordContentInteraction(
-                            context,
-                            ContentType.QUESTION,
-                            target.id.toString(),
-                        )
-                    }
-                    else -> {
-                        // 其他类型暂不处理
-                    }
-                }
-            } catch (e: Exception) {
-                Log.e("HomeFeedViewModel", "Failed to record content interaction", e)
-            }
-        }
+        // 不记录交互行为
     }
 
     /**
      * 记录用户点击内容
-     * 在viewModelScope中运行，使用viewModelScope代替GlobalScope
+     * 已禁用，不发送已读状态
      */
     override fun onUiContentClick(context: Context, feed: Feed, item: BaseFeedViewModel.FeedDisplayItem) {
-        viewModelScope.launch(Dispatchers.IO) {
-            sendReadStatusToServer(context, feed)
-            recordContentInteraction(context, feed)
-        }
+        // 不发送已读状态到服务器
     }
 
     private suspend fun markItemsAsTouched(
