@@ -42,7 +42,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -58,7 +57,6 @@ import com.github.zly2006.zhihu.LocalNavigator
 import com.github.zly2006.zhihu.Notification
 import com.github.zly2006.zhihu.Person
 import com.github.zly2006.zhihu.Question
-import com.github.zly2006.zhihu.R
 import com.github.zly2006.zhihu.data.NotificationItem
 import com.github.zly2006.zhihu.data.NotificationTarget
 import com.github.zly2006.zhihu.ui.components.DraggableRefreshButton

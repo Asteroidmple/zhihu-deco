@@ -42,18 +42,18 @@ class LoginActivity : ComponentActivity() {
                     onLoad = { webView ->
                         if (webViewLoaded) return@WebviewComp
                         webViewLoaded = true
-                        
+
                         @SuppressLint("SetJavaScriptEnabled")
                         webView.settings.javaScriptEnabled = true
                         webView.settings.domStorageEnabled = true
-                        
+
                         // 先调用 setupUpWebviewClient 设置基础配置
                         webView.setupUpWebviewClient()
-                        
+
                         // 清除所有 cookies
                         CookieManager.getInstance().removeAllCookies { }
                         CookieManager.getInstance().setAcceptThirdPartyCookies(webView, true)
-                        
+
                         // 设置自定义 WebViewClient
                         webView.webViewClient = object : WebViewClient() {
                             override fun shouldOverrideUrlLoading(

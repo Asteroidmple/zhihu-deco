@@ -4,7 +4,6 @@ import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.core.net.toUri
-import androidx.lifecycle.viewModelScope
 import com.github.zly2006.zhihu.Article
 import com.github.zly2006.zhihu.ArticleType
 import com.github.zly2006.zhihu.Pin
@@ -15,7 +14,6 @@ import com.github.zly2006.zhihu.data.CommonFeed
 import com.github.zly2006.zhihu.data.Feed
 import com.github.zly2006.zhihu.data.Person
 import com.github.zly2006.zhihu.resolveContent
-import io.ktor.serialization.kotlinx.json.json as ktorJson
 import com.github.zly2006.zhihu.ui.IHomeFeedViewModel
 import com.github.zly2006.zhihu.ui.PREFERENCE_NAME
 import com.github.zly2006.zhihu.viewmodel.feed.BaseFeedViewModel
@@ -29,17 +27,16 @@ import io.ktor.client.plugins.cookies.HttpCookies
 import io.ktor.client.request.get
 import io.ktor.http.decodeURLPart
 import io.ktor.http.isSuccess
-import io.ktor.serialization.kotlinx.json.json as ktorJson
 import io.ktor.util.appendAll
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import io.ktor.serialization.kotlinx.json.json as ktorJson
 
 private val ZHIHU_PP_ANDROID_HEADERS = createClientPlugin("ZhihuPPAndroidHeaders", { }) {
     onRequest { request, _ ->
@@ -169,7 +166,7 @@ class AndroidHomeFeedViewModel :
                     displayItems.removeAll { item ->
                         item.navDestination in newDestinations && filteredItems.none { it.navDestination == item.navDestination }
                     }
-                    
+
                     // 添加新的未被过滤的条目
                     filteredItems.forEach { item ->
                         if (displayItems.none { it.navDestination == item.navDestination }) {
@@ -215,169 +212,167 @@ private fun createFeedFromDestination(
     summary: String,
     authorName: String,
     avatar: String,
-): Feed? {
-    return when (routeDest) {
-        is Article -> {
-            when (routeDest.type) {
-                ArticleType.Answer -> {
-                    CommonFeed(
-                        id = "android_${routeDest.id}",
-                        verb = "ANDROID_RECOMMENDATION",
-                        target = Feed.AnswerTarget(
-                            id = routeDest.id,
-                            url = "https://www.zhihu.com/answer/${routeDest.id}",
-                            author = Person(
-                                id = "",
-                                url = "",
-                                userType = "",
-                                urlToken = null,
-                                name = authorName,
-                                headline = "",
-                                avatarUrl = avatar,
-                                isOrg = false,
-                                gender = 0,
-                                followersCount = 0,
-                                isFollowing = false,
-                                isFollowed = false,
-                                badge = null,
-                            ),
-                            createdTime = -1,
-                            updatedTime = -1,
-                            voteupCount = -1,
-                            thanksCount = -1,
-                            commentCount = -1,
-                            isCopyable = false,
-                            question = Feed.QuestionTarget(
-                                id = 0,
-                                _title = title,
-                                url = "",
-                                type = "question",
-                                answerCount = 0,
-                                commentCount = 0,
-                                followerCount = 0,
-                                isFollowing = false,
-                            ),
-                            excerpt = summary,
+): Feed? = when (routeDest) {
+    is Article -> {
+        when (routeDest.type) {
+            ArticleType.Answer -> {
+                CommonFeed(
+                    id = "android_${routeDest.id}",
+                    verb = "ANDROID_RECOMMENDATION",
+                    target = Feed.AnswerTarget(
+                        id = routeDest.id,
+                        url = "https://www.zhihu.com/answer/${routeDest.id}",
+                        author = Person(
+                            id = "",
+                            url = "",
+                            userType = "",
+                            urlToken = null,
+                            name = authorName,
+                            headline = "",
+                            avatarUrl = avatar,
+                            isOrg = false,
+                            gender = 0,
+                            followersCount = 0,
+                            isFollowing = false,
+                            isFollowed = false,
+                            badge = null,
                         ),
-                    )
-                }
-                ArticleType.Article -> {
-                    CommonFeed(
-                        id = "android_${routeDest.id}",
-                        verb = "ANDROID_RECOMMENDATION",
-                        target = Feed.ArticleTarget(
-                            id = routeDest.id,
-                            url = "https://zhuanlan.zhihu.com/p/${routeDest.id}",
-                            author = Person(
-                                id = "",
-                                url = "",
-                                userType = "",
-                                urlToken = null,
-                                name = authorName,
-                                headline = "",
-                                avatarUrl = avatar,
-                                isOrg = false,
-                                gender = 0,
-                                followersCount = 0,
-                                isFollowing = false,
-                                isFollowed = false,
-                                badge = null,
-                            ),
-                            voteupCount = -1,
-                            commentCount = -1,
-                            title = title,
-                            excerpt = summary,
-                            content = "",
-                            created = -1,
-                            updated = 0,
-                            isLabeled = false,
-                            visitedCount = 0,
-                            favoriteCount = 0,
+                        createdTime = -1,
+                        updatedTime = -1,
+                        voteupCount = -1,
+                        thanksCount = -1,
+                        commentCount = -1,
+                        isCopyable = false,
+                        question = Feed.QuestionTarget(
+                            id = 0,
+                            _title = title,
+                            url = "",
+                            type = "question",
+                            answerCount = 0,
+                            commentCount = 0,
+                            followerCount = 0,
+                            isFollowing = false,
                         ),
-                    )
-                }
+                        excerpt = summary,
+                    ),
+                )
+            }
+            ArticleType.Article -> {
+                CommonFeed(
+                    id = "android_${routeDest.id}",
+                    verb = "ANDROID_RECOMMENDATION",
+                    target = Feed.ArticleTarget(
+                        id = routeDest.id,
+                        url = "https://zhuanlan.zhihu.com/p/${routeDest.id}",
+                        author = Person(
+                            id = "",
+                            url = "",
+                            userType = "",
+                            urlToken = null,
+                            name = authorName,
+                            headline = "",
+                            avatarUrl = avatar,
+                            isOrg = false,
+                            gender = 0,
+                            followersCount = 0,
+                            isFollowing = false,
+                            isFollowed = false,
+                            badge = null,
+                        ),
+                        voteupCount = -1,
+                        commentCount = -1,
+                        title = title,
+                        excerpt = summary,
+                        content = "",
+                        created = -1,
+                        updated = 0,
+                        isLabeled = false,
+                        visitedCount = 0,
+                        favoriteCount = 0,
+                    ),
+                )
             }
         }
-        is Question -> {
-            CommonFeed(
-                id = "android_question_${routeDest.questionId}",
-                verb = "ANDROID_RECOMMENDATION",
-                target = Feed.QuestionTarget(
-                    id = routeDest.questionId,
-                    _title = title,
-                    url = "https://www.zhihu.com/question/${routeDest.questionId}",
-                    type = "question",
-                    answerCount = 0,
-                    commentCount = 0,
-                    followerCount = 0,
-                    isFollowing = false,
-                ),
-            )
-        }
-        is Pin -> {
-            CommonFeed(
-                id = "android_pin_${routeDest.id}",
-                verb = "ANDROID_RECOMMENDATION",
-                target = Feed.PinTarget(
-                    id = routeDest.id,
-                    url = "https://www.zhihu.com/pin/${routeDest.id}",
-                    author = Person(
-                        id = "",
-                        url = "",
-                        userType = "",
-                        urlToken = null,
-                        name = authorName,
-                        headline = "",
-                        avatarUrl = avatar,
-                        isOrg = false,
-                        gender = 0,
-                        followersCount = 0,
-                        isFollowing = false,
-                        isFollowed = false,
-                        badge = null,
-                    ),
-                    commentCount = 0,
-                    content = kotlinx.serialization.json.JsonArray(emptyList()),
-                    likeCount = 0,
-                    excerptTitle = title,
-                    contentHtml = summary,
-                    created = -1,
-                    updated = 0,
-                    reactionCount = 0,
-                    favoriteCount = 0,
-                ),
-            )
-        }
-        is Video -> {
-            CommonFeed(
-                id = "android_video_${routeDest.id}",
-                verb = "ANDROID_RECOMMENDATION",
-                target = Feed.VideoTarget(
-                    id = routeDest.id,
-                    url = "https://www.zhihu.com/zvideo/${routeDest.id}",
-                    author = Person(
-                        id = "",
-                        url = "",
-                        userType = "",
-                        urlToken = null,
-                        name = authorName,
-                        headline = "",
-                        avatarUrl = avatar,
-                        isOrg = false,
-                        gender = 0,
-                        followersCount = 0,
-                        isFollowing = false,
-                        isFollowed = false,
-                        badge = null,
-                    ),
-                    voteCount = -1,
-                    commentCount = 0,
-                    title = title,
-                    description = summary,
-                    excerpt = summary,
-                ),
-            )
-        }
-        else -> null
     }
+    is Question -> {
+        CommonFeed(
+            id = "android_question_${routeDest.questionId}",
+            verb = "ANDROID_RECOMMENDATION",
+            target = Feed.QuestionTarget(
+                id = routeDest.questionId,
+                _title = title,
+                url = "https://www.zhihu.com/question/${routeDest.questionId}",
+                type = "question",
+                answerCount = 0,
+                commentCount = 0,
+                followerCount = 0,
+                isFollowing = false,
+            ),
+        )
+    }
+    is Pin -> {
+        CommonFeed(
+            id = "android_pin_${routeDest.id}",
+            verb = "ANDROID_RECOMMENDATION",
+            target = Feed.PinTarget(
+                id = routeDest.id,
+                url = "https://www.zhihu.com/pin/${routeDest.id}",
+                author = Person(
+                    id = "",
+                    url = "",
+                    userType = "",
+                    urlToken = null,
+                    name = authorName,
+                    headline = "",
+                    avatarUrl = avatar,
+                    isOrg = false,
+                    gender = 0,
+                    followersCount = 0,
+                    isFollowing = false,
+                    isFollowed = false,
+                    badge = null,
+                ),
+                commentCount = 0,
+                content = kotlinx.serialization.json.JsonArray(emptyList()),
+                likeCount = 0,
+                excerptTitle = title,
+                contentHtml = summary,
+                created = -1,
+                updated = 0,
+                reactionCount = 0,
+                favoriteCount = 0,
+            ),
+        )
+    }
+    is Video -> {
+        CommonFeed(
+            id = "android_video_${routeDest.id}",
+            verb = "ANDROID_RECOMMENDATION",
+            target = Feed.VideoTarget(
+                id = routeDest.id,
+                url = "https://www.zhihu.com/zvideo/${routeDest.id}",
+                author = Person(
+                    id = "",
+                    url = "",
+                    userType = "",
+                    urlToken = null,
+                    name = authorName,
+                    headline = "",
+                    avatarUrl = avatar,
+                    isOrg = false,
+                    gender = 0,
+                    followersCount = 0,
+                    isFollowing = false,
+                    isFollowed = false,
+                    badge = null,
+                ),
+                voteCount = -1,
+                commentCount = 0,
+                title = title,
+                description = summary,
+                excerpt = summary,
+            ),
+        )
+    }
+    else -> null
 }

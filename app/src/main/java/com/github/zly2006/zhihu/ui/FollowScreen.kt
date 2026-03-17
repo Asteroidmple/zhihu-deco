@@ -165,8 +165,7 @@ fun FollowingUsersRow() {
                                         jumpTo = "动态",
                                     ),
                                 )
-                            }
-                            .padding(vertical = 4.dp, horizontal = 4.dp),
+                            }.padding(vertical = 4.dp, horizontal = 4.dp),
                     ) {
                         BadgedBox(
                             badge = {

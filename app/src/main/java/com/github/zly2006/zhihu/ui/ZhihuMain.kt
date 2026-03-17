@@ -1,7 +1,6 @@
 package com.github.zly2006.zhihu.ui
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.content.SharedPreferences
 import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.AnimatedVisibility
@@ -45,15 +44,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.TextStyle
@@ -61,7 +59,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.edit
-import androidx.core.net.toUri
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
@@ -72,7 +69,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.github.zly2006.zhihu.R
 import com.github.zly2006.zhihu.Account
 import com.github.zly2006.zhihu.Article
 import com.github.zly2006.zhihu.CollectionContent
@@ -94,6 +90,8 @@ import com.github.zly2006.zhihu.Question
 import com.github.zly2006.zhihu.Search
 import com.github.zly2006.zhihu.SentenceSimilarityTest
 import com.github.zly2006.zhihu.TopLevelDestination
+import com.github.zly2006.zhihu.theme.MiuiSmoothCornerShape
+import com.github.zly2006.zhihu.theme.ThemeManager
 import com.github.zly2006.zhihu.theme.ZhihuTheme
 import com.github.zly2006.zhihu.ui.subscreens.AppearanceSettingsScreen
 import com.github.zly2006.zhihu.ui.subscreens.BlockedFeedHistoryScreen
@@ -144,6 +142,7 @@ fun ZhihuMain(modifier: Modifier = Modifier, navController: NavHostController) {
     var duo3HomeAccount by remember { mutableStateOf(preferences.getBoolean("duo3_home_account", false)) }
     var duo3HomeScrollTop by remember { mutableStateOf(preferences.getBoolean("duo3_home_scroll_top", false)) }
     var duo3NavStyle by remember { mutableStateOf(preferences.getBoolean("duo3_nav_style", false)) }
+    val useMiuix = remember { ThemeManager.getUseMiuixSync() }
     var tapToRefreshEnabled by remember { mutableStateOf(preferences.getBoolean("bottomBarTapRefresh", true)) }
     var tapToScrollToTopEnabled by remember { mutableStateOf(preferences.getBoolean("bottomBarTapScrollToTop", true)) }
     var autoHideBottomBar by remember { mutableStateOf(preferences.getBoolean("autoHideBottomBar", false)) }
@@ -253,9 +252,16 @@ fun ZhihuMain(modifier: Modifier = Modifier, navController: NavHostController) {
                     exit = slideOutVertically(tween(200)) { it },
                 ) {
                     NavigationBar(
-                        modifier = Modifier.height(
-                            (if (duo3NavStyle) 64.dp else 56.dp) + bottomPadding,
-                        ),
+                        modifier = Modifier
+                            .height(
+                                (if (duo3NavStyle) 64.dp else 56.dp) + bottomPadding,
+                            ).then(
+                                if (useMiuix) {
+                                    Modifier.clip(MiuiSmoothCornerShape(radius = 24.dp))
+                                } else {
+                                    Modifier
+                                },
+                            ),
                     ) {
                         val allItems = if (duo3HomeAccount) {
                             listOf(
@@ -316,7 +322,7 @@ fun ZhihuMain(modifier: Modifier = Modifier, navController: NavHostController) {
                                     }
                                 },
                                 alwaysShowLabel = duo3NavStyle,
-                                colors = if (duo3NavStyle) {
+                                colors = if (duo3NavStyle || useMiuix) {
                                     NavigationBarItemDefaults.colors()
                                 } else {
                                     NavigationBarItemDefaults.colors(

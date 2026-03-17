@@ -87,7 +87,9 @@ class LocalHomeFeedViewModel :
                                 excerpt = localFeed.summary,
                             ),
                         )
-                    } else null
+                    } else {
+                        null
+                    }
                 }
                 // 判断是否是文章
                 navDest.startsWith("article/") -> {
@@ -126,7 +128,9 @@ class LocalHomeFeedViewModel :
                                 favoriteCount = 0,
                             ),
                         )
-                    } else null
+                    } else {
+                        null
+                    }
                 }
                 // 判断是否是问题
                 navDest.startsWith("question/") -> {
@@ -146,7 +150,9 @@ class LocalHomeFeedViewModel :
                                 isFollowing = false,
                             ),
                         )
-                    } else null
+                    } else {
+                        null
+                    }
                 }
                 else -> null
             }

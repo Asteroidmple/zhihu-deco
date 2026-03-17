@@ -9,11 +9,11 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -50,12 +50,10 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -67,11 +65,17 @@ import com.github.zly2006.zhihu.BuildConfig
 import com.github.zly2006.zhihu.LocalNavigator
 import com.github.zly2006.zhihu.data.Feed
 import com.github.zly2006.zhihu.data.target
-import com.github.zly2006.zhihu.viewmodel.feed.BaseFeedViewModel.FeedDisplayItem
+import com.github.zly2006.zhihu.theme.MiuiSmoothCornerShape
+import com.github.zly2006.zhihu.theme.NeutralGray500
 import com.github.zly2006.zhihu.theme.ThemeManager
+import com.github.zly2006.zhihu.theme.ZhihuBlue
+import com.github.zly2006.zhihu.theme.ZhihuGreen
+import com.github.zly2006.zhihu.theme.ZhihuOrange
+import com.github.zly2006.zhihu.theme.ZhihuRed
 import com.github.zly2006.zhihu.ui.PREFERENCE_NAME
 import com.github.zly2006.zhihu.util.parseHtmlTextWithTheme
 import com.github.zly2006.zhihu.viewmodel.feed.BaseFeedViewModel
+import com.github.zly2006.zhihu.viewmodel.feed.BaseFeedViewModel.FeedDisplayItem
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.math.max
@@ -114,6 +118,7 @@ fun FeedCard(
     }
     val duo3CardAppearance = remember { preferences.getBoolean("duo3_card_appearance", false) }
     val duo3CardLayout = remember { preferences.getBoolean("duo3_card_layout", false) }
+    val useMiuix = remember { ThemeManager.getUseMiuixSync() }
 
     // 动画偏移量
     val animatedOffsetX by animateFloatAsState(
@@ -183,7 +188,13 @@ fun FeedCard(
                 } else {
                     CardDefaults.cardColors()
                 },
-                shape = if (duo3CardAppearance) RoundedCornerShape(24.dp) else CardDefaults.shape,
+                shape = if (duo3CardAppearance) {
+                    RoundedCornerShape(24.dp)
+                } else if (useMiuix) {
+                    MiuiSmoothCornerShape(radius = 16.dp)
+                } else {
+                    CardDefaults.shape
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .alpha(1 - min(actionAlpha, 0.5f))
@@ -595,7 +606,7 @@ private fun FeedCardContent(
                     modifier = Modifier.weight(1f),
                 )
             }
-            
+
             Box {
                 IconButton(
                     onClick = { onShowMenuChange(true) },
@@ -665,7 +676,7 @@ private fun FeedCardContent(
                 }
             }
         }
-        
+
         if (!thumbnailUrl.isNullOrEmpty() && showFeedThumbnail) {
             Spacer(modifier = Modifier.height(8.dp))
             AsyncImage(
@@ -691,33 +702,27 @@ private fun getTagInfo(feed: Feed?, item: FeedDisplayItem): TagInfo {
     // 首先尝试通过 feed.target 判断
     if (feed != null) {
         val target = feed.target
-        
+
         if (target != null) {
             // 直接使用 when 表达式检查 target 的实际类型
             return when (target) {
-                is com.github.zly2006.zhihu.data.Feed.AnswerTarget -> TagInfo("回答", Color(0xFF0084FF))
-                is com.github.zly2006.zhihu.data.Feed.ArticleTarget -> TagInfo("文章", Color(0xFF00C853))
-                is com.github.zly2006.zhihu.data.Feed.VideoTarget -> TagInfo("视频", Color(0xFFFF6B00))
-                is com.github.zly2006.zhihu.data.Feed.PinTarget -> TagInfo("想法", Color(0xFFF1403C))
-                is com.github.zly2006.zhihu.data.Feed.QuestionTarget -> TagInfo("问题", Color(0xFF0084FF))
-                else -> TagInfo("其他", Color(0xFF8E8E93))
+                is com.github.zly2006.zhihu.data.Feed.AnswerTarget -> TagInfo("回答", ZhihuBlue)
+                is com.github.zly2006.zhihu.data.Feed.ArticleTarget -> TagInfo("文章", ZhihuGreen)
+                is com.github.zly2006.zhihu.data.Feed.VideoTarget -> TagInfo("视频", ZhihuOrange)
+                is com.github.zly2006.zhihu.data.Feed.PinTarget -> TagInfo("想法", ZhihuRed)
+                is com.github.zly2006.zhihu.data.Feed.QuestionTarget -> TagInfo("问题", ZhihuBlue)
+                else -> TagInfo("其他", NeutralGray500)
             }
         }
     }
-    
+
     // 如果 feed 或 target 为 null，使用 item.details 作为后备方案
-    val details = item.details
-    android.util.Log.d("FeedCard", "getTagInfo: feed=${feed != null}, target=${feed?.target != null}, details='$details'")
-    
-    return when (details) {
-        "回答" -> TagInfo("回答", Color(0xFF0084FF))
-        "文章" -> TagInfo("文章", Color(0xFF00C853))
-        "视频" -> TagInfo("视频", Color(0xFFFF6B00))
-        "想法" -> TagInfo("想法", Color(0xFFF1403C))
-        "问题" -> TagInfo("问题", Color(0xFF0084FF))
-        else -> {
-            android.util.Log.d("FeedCard", "getTagInfo: details='$details' -> 其他")
-            TagInfo("其他", Color(0xFF8E8E93))
-        }
+    return when (item.details) {
+        "回答" -> TagInfo("回答", ZhihuBlue)
+        "文章" -> TagInfo("文章", ZhihuGreen)
+        "视频" -> TagInfo("视频", ZhihuOrange)
+        "想法" -> TagInfo("想法", ZhihuRed)
+        "问题" -> TagInfo("问题", ZhihuBlue)
+        else -> TagInfo("其他", NeutralGray500)
     }
 }

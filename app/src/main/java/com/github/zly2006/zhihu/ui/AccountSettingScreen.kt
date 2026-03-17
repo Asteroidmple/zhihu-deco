@@ -194,11 +194,11 @@ fun AccountSettingScreen(
                             }
                         }
                     }
-                    
+
                     val showLoginButtons = remember {
                         preferences.getBoolean("showQrLoginButtons", false)
                     }
-                    
+
                     if (showLoginButtons) {
                         FilledTonalIconButton(
                             onClick = {

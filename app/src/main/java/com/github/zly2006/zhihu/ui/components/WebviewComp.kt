@@ -28,7 +28,6 @@ import androidx.activity.ComponentDialog
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -775,11 +774,9 @@ private fun isTrackerUrl(url: String): Boolean {
         "stats.zhihu.com",
         "log.zhihu.com",
         "logs.zhihu.com",
-        
         // 知乎埋点相关
         "oa.zhihu.com",
         "zhihu-web-analytics.zhihu.com",
-        
         // 第三方统计和广告跟踪
         "google-analytics.com",
         "www.google-analytics.com",
@@ -787,11 +784,9 @@ private fun isTrackerUrl(url: String): Boolean {
         "googleadservices.com",
         "googletagmanager.com",
         "googletagservices.com",
-        
         //  Facebook Pixel
         "facebook.com/tr",
         "connect.facebook.net",
-        
         // 其他常见跟踪器
         "hotjar.com",
         "crazyegg.com",
@@ -799,33 +794,26 @@ private fun isTrackerUrl(url: String): Boolean {
         "mixpanel.com",
         "segment.com",
         "amplitude.com",
-        
         // 百度统计
         "hm.baidu.com",
         "cpro.baidu.com",
-        
         // 腾讯分析
         "tajs.qq.com",
-        
         // 阿里妈妈
         "alimama.com",
         "tanx.com",
-        
         // 秒针系统
         "miaozhen.com",
-        
         // 友盟
         "umeng.com",
         "umtrack.com",
-        
         // GrowingIO
         "growingio.com",
-        
         // 神策数据
         "sensorsdata.cn",
         "sensors-dataprocessing.cn",
     )
-    
+
     // 跟踪器路径关键词
     val trackerPaths = listOf(
         "/analytics/",
@@ -868,48 +856,53 @@ private fun isTrackerUrl(url: String): Boolean {
         "track.gif",
         "report.gif",
     )
-    
+
     // 检查域名
     for (domain in trackerDomains) {
         if (url.contains(domain, ignoreCase = true)) {
             return true
         }
     }
-    
+
     // 检查路径
     for (path in trackerPaths) {
         if (url.contains(path, ignoreCase = true)) {
             return true
         }
     }
-    
+
     // 检查埋点请求特征
-    if (url.contains("event=", ignoreCase = true) && 
-        (url.contains("track", ignoreCase = true) || 
-         url.contains("beacon", ignoreCase = true) ||
-         url.contains("log", ignoreCase = true))) {
+    if (url.contains("event=", ignoreCase = true) &&
+        (
+            url.contains("track", ignoreCase = true) ||
+                url.contains("beacon", ignoreCase = true) ||
+                url.contains("log", ignoreCase = true)
+        )
+    ) {
         return true
     }
-    
+
     // 检查知乎自身的埋点 API
-    if (url.contains("zhihu.com") && 
-        (url.contains("/api/v4/track", ignoreCase = true) ||
-         url.contains("/api/v4/analytics", ignoreCase = true) ||
-         url.contains("/web-analytics", ignoreCase = true) ||
-         url.contains("action=", ignoreCase = true) && url.contains("target=", ignoreCase = true))) {
+    if (url.contains("zhihu.com") &&
+        (
+            url.contains("/api/v4/track", ignoreCase = true) ||
+                url.contains("/api/v4/analytics", ignoreCase = true) ||
+                url.contains("/web-analytics", ignoreCase = true) ||
+                url.contains("action=", ignoreCase = true) &&
+                url.contains("target=", ignoreCase = true)
+        )
+    ) {
         return true
     }
-    
+
     return false
 }
 
 /**
  * 创建空响应以阻止跟踪器加载
  */
-private fun createEmptyResponse(): WebResourceResponse {
-    return WebResourceResponse(
-        "text/plain",
-        "UTF-8",
-        "".byteInputStream()
-    )
-}
+private fun createEmptyResponse(): WebResourceResponse = WebResourceResponse(
+    "text/plain",
+    "UTF-8",
+    "".byteInputStream(),
+)

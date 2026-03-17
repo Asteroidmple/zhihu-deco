@@ -60,7 +60,6 @@ import com.github.zly2006.zhihu.data.AccountData
 import com.github.zly2006.zhihu.data.CommonFeed
 import com.github.zly2006.zhihu.data.DataHolder
 import com.github.zly2006.zhihu.data.Feed
-import com.github.zly2006.zhihu.data.Person as DataPerson
 import com.github.zly2006.zhihu.ui.components.FeedCard
 import com.github.zly2006.zhihu.ui.components.OpenImageDislog
 import com.github.zly2006.zhihu.ui.components.PaginatedList
@@ -84,6 +83,7 @@ import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonPrimitive
 import org.jsoup.Jsoup
 import kotlin.reflect.typeOf
+import com.github.zly2006.zhihu.data.Person as DataPerson
 
 class PeopleAnswersViewModel(
     val person: Person,

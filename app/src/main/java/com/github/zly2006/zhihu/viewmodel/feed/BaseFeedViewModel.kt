@@ -24,7 +24,6 @@ import com.github.zly2006.zhihu.ui.PREFERENCE_NAME
 import com.github.zly2006.zhihu.viewmodel.PaginationViewModel
 import com.github.zly2006.zhihu.viewmodel.filter.BlocklistManager
 import com.github.zly2006.zhihu.viewmodel.filter.ContentFilterExtensions
-import com.github.zly2006.zhihu.viewmodel.filter.ContentType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -51,13 +50,13 @@ abstract class BaseFeedViewModel : PaginationViewModel<Feed>(typeOf<Feed>()) {
 
     override fun processResponse(context: Context, data: List<Feed>, rawData: JsonArray) {
         super.processResponse(context, data, rawData)
-        
+
         viewModelScope.launch {
             val newItems = data.flatten().map { createDisplayItem(context, it) }
-            
+
             // 应用内容过滤
             val filteredItems = ContentFilterExtensions.applyContentFilterToDisplayItems(context, newItems)
-            
+
             // 更新 displayItems
             withContext(Dispatchers.Main) {
                 displayItems.addAll(filteredItems)

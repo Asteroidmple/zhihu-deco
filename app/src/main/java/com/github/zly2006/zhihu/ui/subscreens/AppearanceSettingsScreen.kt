@@ -56,7 +56,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.edit
 import com.github.zly2006.zhihu.Account
@@ -66,9 +65,9 @@ import com.github.zly2006.zhihu.Home
 import com.github.zly2006.zhihu.HotList
 import com.github.zly2006.zhihu.LocalNavigator
 import com.github.zly2006.zhihu.OnlineHistory
-import com.github.zly2006.zhihu.R
 import com.github.zly2006.zhihu.theme.ThemeManager
 import com.github.zly2006.zhihu.theme.ThemeMode
+import com.github.zly2006.zhihu.theme.ThemeStyle
 import com.github.zly2006.zhihu.ui.PREFERENCE_NAME
 import com.github.zly2006.zhihu.ui.components.ColorPickerDialog
 import com.github.zly2006.zhihu.ui.components.HighlightableSettingContainer
@@ -127,6 +126,56 @@ fun AppearanceSettingsScreen(
         ) {
             val useDynamicColor = ThemeManager.getUseDynamicColor()
             val currentThemeMode = ThemeManager.getThemeMode()
+            val currentThemeStyle = ThemeManager.getThemeStyle()
+
+            // ── 主题风格 ────────────────────────────────────────────────────────
+            Text(
+                "主题风格",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(top = 16.dp, bottom = 8.dp),
+            )
+
+            Column(modifier = Modifier.padding(vertical = 8.dp)) {
+                Text(
+                    "主题风格",
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.padding(bottom = 8.dp),
+                )
+                Text(
+                    "MIUIX 是小米风格的 Compose UI 库，Material Design 是谷歌标准设计语言",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(bottom = 8.dp),
+                )
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    val themeStyles = listOf(
+                        ThemeStyle.MATERIAL to "Material Design",
+                        ThemeStyle.MIUIX to "MIUIX",
+                    )
+                    themeStyles.forEach { (style, label) ->
+                        OutlinedButton(
+                            onClick = {
+                                ThemeManager.setThemeStyle(context, style)
+                                Toast.makeText(context, "已切换到$label", Toast.LENGTH_SHORT).show()
+                            },
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                containerColor = if (currentThemeStyle == style) {
+                                    MaterialTheme.colorScheme.primaryContainer
+                                } else {
+                                    MaterialTheme.colorScheme.surface
+                                },
+                            ),
+                            modifier = Modifier.weight(1f),
+                        ) {
+                            Text(label)
+                        }
+                    }
+                }
+            }
 
             // ── 主题 ────────────────────────────────────────────────────────────
             Text(

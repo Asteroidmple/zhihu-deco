@@ -440,10 +440,16 @@ fun CommentScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .imePadding() // 添加 imePadding 确保整体适配输入法
                     .padding(bottom = WindowInsets.systemBars.asPaddingValues().calculateBottomPadding()),
             ) {
                 CommentTopText(content())
-                Box(modifier = Modifier.weight(1f)) {
+                // 评论列表区域 - 使用 weight(1f) 占据剩余空间
+                Box(
+                    modifier = Modifier
+                        .weight(1f) // 占据除输入框外的所有剩余空间
+                        .fillMaxWidth(),
+                ) {
                     when {
                         viewModel.isLoading && viewModel.allData.isEmpty() -> {
                             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -650,8 +656,7 @@ fun CommentScreen(
                 Surface(
                     tonalElevation = 2.dp,
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .imePadding(),
+                        .fillMaxWidth(),
                 ) {
                     Column {
                         // Reply indicator bar

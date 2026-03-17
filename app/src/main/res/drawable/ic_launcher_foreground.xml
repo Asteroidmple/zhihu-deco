@@ -3,32 +3,29 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- 背景圆形 -->
-    <path
-        android:fillColor="#6366F1"
-        android:pathData="M54,54m-40,0a40,40 0,1 1,80 0a40,40 0,1 1,-80 0"/>
     
-    <!-- 抽象的书本/知识符号 -->
-    <group
-        android:translateX="27"
-        android:translateY="35">
-        <!-- 左页 -->
-        <path
-            android:fillColor="#FFFFFF"
-            android:pathData="M27,0L27,32C27,32 18,28 9,32C9,32 9,8 9,8C9,4 13,0 27,0Z"/>
-        <!-- 右页 -->
-        <path
-            android:fillColor="#FFFFFF"
-            android:pathData="M27,0L27,32C27,32 36,28 45,32C45,32 45,8 45,8C45,4 41,0 27,0Z"/>
-        <!-- 书脊 -->
-        <path
-            android:fillColor="#E0E7FF"
-            android:pathData="M25,0L29,0L29,32L25,32Z"/>
-    </group>
-    
-    <!-- 装饰性光晕 -->
+    <!-- 背景圆角矩形 - 蓝色 -->
     <path
-        android:fillColor="#818CF8"
-        android:fillAlpha="0.3"
-        android:pathData="M54,14C54,14 58,18 58,22C58,26 54,30 54,30C54,30 50,26 50,22C50,18 54,14 54,14Z"/>
+        android:fillColor="#1E88E5"
+        android:pathData="M22,12C15,12 10,17 10,24L10,84C10,91 15,96 22,96L86,96C93,96 98,91 98,84L98,24C98,17 93,12 86,12L22,12Z"/>
+    
+    <!-- 小狗身体 - 白色 -->
+    <path
+        android:fillColor="#F5F7F9"
+        android:pathData="M32,36L32,68C32,72 36,76 40,76L68,76C72,76 76,72 76,68L76,44C76,36 68,34 60,40L56,32L48,40L40,36Z"/>
+    
+    <!-- 左耳 - 浅蓝 -->
+    <path
+        android:fillColor="#90CAF9"
+        android:pathData="M56,32C56,32 54,22 60,22C66,22 68,32 68,32L64,36L60,36Z"/>
+    
+    <!-- 眼睛 - 黑色 -->
+    <path
+        android:fillColor="#333333"
+        android:pathData="M54,50m-3,0a3,3 0,1 1,6 0a3,3 0,1 1,-6 0"/>
+    
+    <!-- 尾巴 - 浅蓝 -->
+    <path
+        android:fillColor="#90CAF9"
+        android:pathData="M76,56C76,56 84,58 84,64C84,70 76,70 76,70L74,66L76,60Z"/>
 </vector>

@@ -10,7 +10,6 @@ import com.github.zly2006.zhihu.ui.IHomeFeedViewModel
 import com.github.zly2006.zhihu.ui.PREFERENCE_NAME
 import com.github.zly2006.zhihu.util.signFetchRequest
 import com.github.zly2006.zhihu.viewmodel.filter.ContentFilterExtensions
-import com.github.zly2006.zhihu.viewmodel.filter.ContentType
 import io.ktor.client.HttpClient
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
@@ -67,7 +66,7 @@ class HomeFeedViewModel :
                 displayItems.removeAll { item ->
                     item.navDestination in newDestinations && filteredItems.none { it.navDestination == item.navDestination }
                 }
-                
+
                 // 添加新的未被过滤的条目
                 filteredItems.forEach { item ->
                     if (displayItems.none { it.navDestination == item.navDestination }) {

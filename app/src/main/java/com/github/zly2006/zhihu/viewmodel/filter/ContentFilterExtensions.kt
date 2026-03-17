@@ -277,11 +277,11 @@ object ContentFilterExtensions {
             "data-edu-card-id", // 知乎学堂
             "mp.weixin.qq.com", // 微信公众号文章链接，常见于被推广的内容中
         )
-        
+
         // 检查标题和摘要中是否包含"广告"字样
         val isExplicitAd = content.title.contains("广告", ignoreCase = true) ||
             content.summary?.contains("广告", ignoreCase = true) == true
-        
+
         return when (val raw = content.raw) {
             is DataHolder.Answer -> blocklist.any { blockWord -> blockWord in raw.content } || raw.paidInfo != null || isExplicitAd
             is DataHolder.Article -> blocklist.any { blockWord -> blockWord in raw.content } || raw.paidInfo != null || isExplicitAd
