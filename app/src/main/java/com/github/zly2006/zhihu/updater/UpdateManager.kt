@@ -90,7 +90,7 @@ object UpdateManager {
         val now = System.currentTimeMillis()
         val dayInMillis = 3 * 60 * 60 * 1000L
 
-        return (now - lastCheck) > dayInMillis // 每3h最多检查一次
+        return (now - lastCheck) > dayInMillis // 每 3h 最多检查一次
     }
 
     /**
@@ -186,7 +186,7 @@ object UpdateManager {
             latestVersion = latestResponse.tagName.takeIf { it.isNotBlank() }?.let { SchematicVersion.fromString(it) }
             releaseNotes = latestResponse.body?.extractReleaseNotes()
 
-            // 如果启用了nightly检查，也检查nightly版本
+            // 如果启用了 nightly 检查，也检查 nightly 版本
             if (checkNightly) {
                 try {
                     val nightlyResponse = client
@@ -198,7 +198,7 @@ object UpdateManager {
                             }
                         }.body<GithubRelease>()
 
-                    // 如果nightly版本比正式版本新，则使用nightly版本
+                    // 如果 nightly 版本比正式版本新，则使用 nightly 版本
                     if (nightlyResponse.tagName == "nightly") {
                         latestVersion = SchematicVersion(
                             allComponents = listOf(999, 0, 0),
@@ -209,7 +209,7 @@ object UpdateManager {
                         releaseNotes = nightlyResponse.body?.extractReleaseNotes()
                     }
                 } catch (e: Exception) {
-                    // nightly版本检查失败时，继续使用正式版本
+                    // nightly 版本检查失败时，继续使用正式版本
                     e.printStackTrace()
                 }
             }
@@ -238,7 +238,7 @@ object UpdateManager {
             updateState.value = Downloading
             val client = AccountData.httpClient(context)
 
-            // 根据版本类型选择API端点
+            // 根据版本类型选择 API 端点
             val apiUrl = if (state.isNightly) GITHUB_API_NIGHTLY else GITHUB_API_LATEST
 
             val release = client
