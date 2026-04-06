@@ -50,7 +50,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
 import com.github.zly2006.zhihu.Article
 import com.github.zly2006.zhihu.ArticleType
-import com.github.zly2006.zhihu.BuildConfig
+import com.github.zly2006.zhihu.CollectionContent
+import com.zhihu.deco.BuildConfig
 import com.github.zly2006.zhihu.LocalNavigator
 import com.github.zly2006.zhihu.MainActivity
 import com.github.zly2006.zhihu.Person
@@ -785,18 +786,12 @@ fun PeopleScreen(
 private fun CollectionListItem(
     collection: DataHolder.Collection,
 ) {
-    val context = LocalContext.current
+    val navigator = LocalNavigator.current
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .clickable {
-                // TODO: Navigate to collection detail
-                Toast
-                    .makeText(
-                        context,
-                        "收藏夹详情功能开发中",
-                        Toast.LENGTH_SHORT,
-                    ).show()
+                navigator.onNavigate(CollectionContent(collection.id))
             }.padding(vertical = 8.dp, horizontal = 4.dp),
     ) {
         Text(

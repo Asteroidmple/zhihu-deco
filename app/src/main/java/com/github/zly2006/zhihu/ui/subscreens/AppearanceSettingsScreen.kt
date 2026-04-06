@@ -1058,7 +1058,7 @@ fun AppearanceSettingsScreen(
                 headlineContent = { Text("Github issue") },
                 supportingContent = { Text("欢迎提交 issue 讨论本次 UI 修改和反馈问题") },
                 trailingContent = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null) },
-                modifier = Modifier.clickable { luoTianYiUrlLauncher(context, "https://github.com/zly2006/zhihu-plus-plus/issues".toUri()) },
+                modifier = Modifier.clickable { luoTianYiUrlLauncher(context, "https://github.com/Asteroidmple/zhihu-deco/issues".toUri()) },
             )
         }
     }

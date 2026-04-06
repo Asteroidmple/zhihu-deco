@@ -189,15 +189,7 @@ object DataHolder {
 
     @Serializable
     data class Relationship(
-        // v4 API removed fields are commented out
-//        val isAuthor: Boolean = false,
-//        val isAuthorized: Boolean = false,
-//        val isNothelp: Boolean = false,
-//        val isFavorited: Boolean = false,
-//        val isThanked: Boolean = false,
         val upvotedFollowees: List<String> = emptyList(),
-        // 1 - 点赞， -1 - 点踩
-//        val voting: Int = 0,
     )
 
     @Serializable
@@ -386,26 +378,11 @@ object DataHolder {
         val visitCount: Int,
         val commentCount: Int,
         val followerCount: Int,
-//        val collapsedAnswerCount: Int = ,
         val detail: String,
-//        val editableDetail: String,
-//        val status: Status,
         val relationship: QuestionRelationship,
         val topics: List<Topic>,
         val author: Author,
-//        val canComment: CanComment,
-//        val thumbnailInfo: ThumbnailInfo,
-//        val reviewInfo: ReviewInfo,
-//        val relatedCards: List<RelatedCard>,
-//        val muteInfo: MuteInfo,
-//        val showAuthor: Boolean,
-//        val isLabeled: Boolean,
-//        val isBannered: Boolean,
-//        val showEncourageAuthor: Boolean,
         val voteupCount: Int,
-//        val canVote: Boolean,
-//        val reactionInstruction: ReactionInstruction,
-//        val invisibleAuthor: Boolean = false,
     ) : Content
 
     @Serializable
@@ -528,12 +505,9 @@ object DataHolder {
         val id: String,
         val type: String,
         val resourceType: String,
-//         val memberId: Long,
         val url: String,
-//        val hot: Boolean,
         val top: Boolean = false,
         val content: String,
-//        val score: Int,
         val createdTime: Long,
         val isDelete: Boolean,
         val collapsed: Boolean,
@@ -545,12 +519,6 @@ object DataHolder {
         val disliked: Boolean = false,
         val dislikeCount: Int = 0,
         val isAuthor: Boolean = false,
-//         val canLike: Boolean,
-//         val canDislike: Boolean,
-//         val canDelete: Boolean,
-//         val canReply: Boolean,
-//         val canHot: Boolean,
-//         val canAuthorTop: Boolean,
         val isAuthorTop: Boolean = false,
         val canCollapse: Boolean = false,
         val canShare: Boolean = false,

@@ -33,11 +33,11 @@ ksp {
 }
 
 android {
-    namespace = "com.github.zly2006.zhihu"
+    namespace = "com.zhihu.deco"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.github.zly2006.zhplus"
+        applicationId = "com.zhihu.deco"
         minSdk = 27
         targetSdk = 35
         versionCode = property("app.versionCode").toString().toIntOrNull() ?: 1
@@ -180,7 +180,6 @@ dependencies {
     implementation("com.journeyapps:zxing-android-embedded:4.3.0")
 
     implementation("androidx.core:core-ktx:1.17.0")
-    implementation("com.google.android.material:material:1.13.0")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.10.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.10.0")
     //noinspection GradleDependency

@@ -6,7 +6,7 @@ import android.util.Log
 import androidx.browser.customtabs.CustomTabColorSchemeParams
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
-import com.github.zly2006.zhihu.BuildConfig
+import com.zhihu.deco.BuildConfig
 import com.github.zly2006.zhihu.MainActivity
 import com.github.zly2006.zhihu.data.AccountData
 import com.github.zly2006.zhihu.data.AccountData.json
@@ -17,12 +17,15 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.Url
 import io.ktor.http.contentType
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.serialization.serializer
 import java.security.MessageDigest
 import kotlin.system.measureNanoTime
+
+private val telemetryScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
 fun HttpRequestBuilder.signFetchRequest() {
     val url = url.buildString()
@@ -57,15 +60,14 @@ fun HttpRequestBuilder.signFetchRequest() {
     header("x-requested-with", "fetch")
 }
 
-@OptIn(DelicateCoroutinesApi::class)
-fun telemetry(context: Context, usage: String) {
+fun telemetry(context: Context, usage: String, scope: CoroutineScope = telemetryScope) {
     require(usage in listOf("start", "login")) {
         "Usage must be either 'start' or 'login', but was '$usage'."
     }
     val preferences = context.getSharedPreferences("com.github.zly2006.zhihu.preferences", Context.MODE_PRIVATE)
     val data = AccountData.loadData(context)
     if (preferences.getBoolean("allowTelemetry", true)) {
-        GlobalScope.launch {
+        scope.launch {
             @OptIn(ExperimentalStdlibApi::class)
             runCatching {
                 val hash = MessageDigest

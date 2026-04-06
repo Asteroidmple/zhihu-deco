@@ -121,7 +121,7 @@ import com.github.zly2006.zhihu.LocalNavigator
 import com.github.zly2006.zhihu.MainActivity
 import com.github.zly2006.zhihu.MainActivity.TtsState
 import com.github.zly2006.zhihu.Question
-import com.github.zly2006.zhihu.R
+import com.zhihu.deco.R
 import com.github.zly2006.zhihu.data.AccountData
 import com.github.zly2006.zhihu.data.Person
 import com.github.zly2006.zhihu.markdown.MarkdownRenderContext

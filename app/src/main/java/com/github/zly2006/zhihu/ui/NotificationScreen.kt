@@ -52,7 +52,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
 import com.github.zly2006.zhihu.Article
 import com.github.zly2006.zhihu.ArticleType
-import com.github.zly2006.zhihu.BuildConfig
+import com.zhihu.deco.BuildConfig
 import com.github.zly2006.zhihu.LocalNavigator
 import com.github.zly2006.zhihu.Notification
 import com.github.zly2006.zhihu.Person

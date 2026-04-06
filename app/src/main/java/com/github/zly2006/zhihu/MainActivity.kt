@@ -39,7 +39,6 @@ import com.github.zly2006.zhihu.theme.ZhihuTheme
 import com.github.zly2006.zhihu.ui.PREFERENCE_NAME
 import com.github.zly2006.zhihu.ui.ZhihuMain
 import com.github.zly2006.zhihu.ui.components.getHighestQualityVideoUrl
-import com.github.zly2006.zhihu.updater.UpdateManager
 import com.github.zly2006.zhihu.util.EmojiManager
 import com.github.zly2006.zhihu.util.PowerSaveModeCompat
 import com.github.zly2006.zhihu.util.ZhihuCredentialRefresher
@@ -305,28 +304,6 @@ class MainActivity : ComponentActivity() {
                 ttsState = TtsState.Error
             }
         }
-
-        // 自动检查更新（在应用启动时）
-        if (savedInstanceState == null) {
-            @OptIn(DelicateCoroutinesApi::class)
-            GlobalScope.launch {
-                try {
-                    val hasUpdate = UpdateManager.autoCheckForUpdate(this@MainActivity)
-                    if (hasUpdate) {
-                        val updateState = UpdateManager.updateState.value
-                        if (updateState is UpdateManager.UpdateState.UpdateAvailable) {
-                            showUpdateDialog(
-                                updateState.version.toString(),
-                                updateState.isNightly,
-                                updateState.releaseNotes?.replace("https://github.com/zly2006/zhihu-deco/pull/", "#"),
-                            )
-                        }
-                    }
-                } catch (e: Exception) {
-                    Log.e(TAG, "Failed to check for updates", e)
-                }
-            }
-        }
     }
 
     private fun initializeTtsSettings() {
@@ -456,48 +433,6 @@ class MainActivity : ComponentActivity() {
 
     fun postHistory(dest: NavDestination) {
         history.add(dest)
-    }
-
-    /**
-     * 显示更新提醒对话框
-     */
-    private fun showUpdateDialog(version: String, isNightly: Boolean, releaseNotes: String?) {
-        val versionType = if (isNightly) "Nightly" else "正式版本"
-        val currentVersion = BuildConfig.VERSION_NAME
-        val changelogText = if (!releaseNotes.isNullOrBlank()) "\n\n$releaseNotes" else ""
-
-        runOnUiThread {
-            AlertDialog
-                .Builder(this)
-                .apply {
-                    setTitle("发现新版本")
-                    setMessage("当前版本：$currentVersion\n新版本：$version ($versionType)$changelogText")
-                    setCancelable(false)
-
-                    // 立即更新按钮
-                    setPositiveButton("立即更新") { dialog, _ ->
-                        dialog.dismiss()
-
-                        lifecycleScope.launch {
-                            Log.i(TAG, "Starting download for version $version")
-                            UpdateManager.downloadUpdate(this@MainActivity)
-                        }
-                        navController.navigate(Account.SystemAndUpdateSettings)
-                    }
-
-                    // 跳过此版本按钮
-                    setNeutralButton("跳过此版本") { _, _ ->
-                        Log.i(TAG, "User chose to skip version $version")
-                        UpdateManager.skipVersion(this@MainActivity, version)
-                    }
-
-                    // 稍后提醒按钮
-                    setNegativeButton("稍后提醒") { _, _ ->
-                        Log.i(TAG, "User chose to be reminded later")
-                        // 不做任何操作，下次启动时会再次检查
-                    }
-                }.show()
-        }
     }
 
     override fun onDestroy() {

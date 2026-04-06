@@ -151,7 +151,17 @@ abstract class BaseFeedViewModel : PaginationViewModel<Feed>(typeOf<Feed>()) {
         )
 
         is GroupFeed -> error("GroupFeed should be flatten") // GroupFeed will be handled in the UI
-        is QuestionFeedCard -> TODO()
+        is QuestionFeedCard -> {
+            val target = feed.target
+            FeedDisplayItem(
+                title = target.title,
+                summary = target.excerpt,
+                details = target.detailsText,
+                avatarSrc = target.author?.avatarUrl,
+                authorName = target.author?.name,
+                feed = feed,
+            )
+        }
     }
 
     fun addDisplayItems(newItems: List<FeedDisplayItem>) {

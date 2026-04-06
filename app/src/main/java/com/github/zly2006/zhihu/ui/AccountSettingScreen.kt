@@ -56,7 +56,7 @@ import androidx.core.content.edit
 import androidx.core.net.toUri
 import coil3.compose.AsyncImage
 import com.github.zly2006.zhihu.Account
-import com.github.zly2006.zhihu.BuildConfig
+import com.zhihu.deco.BuildConfig
 import com.github.zly2006.zhihu.Collections
 import com.github.zly2006.zhihu.LocalNavigator
 import com.github.zly2006.zhihu.LoginActivity
@@ -66,8 +66,6 @@ import com.github.zly2006.zhihu.Person
 import com.github.zly2006.zhihu.QRCodeScanActivity
 import com.github.zly2006.zhihu.WebviewActivity
 import com.github.zly2006.zhihu.data.AccountData
-import com.github.zly2006.zhihu.updater.UpdateManager
-import com.github.zly2006.zhihu.updater.UpdateManager.UpdateState
 import com.github.zly2006.zhihu.util.clipboardManager
 import com.github.zly2006.zhihu.util.signFetchRequest
 import io.ktor.http.Url
@@ -313,8 +311,8 @@ fun AccountSettingScreen(
         )
 
         ListItem(
-            headlineContent = { Text("系统与更新") },
-            supportingContent = { Text("GitHub、更新设置等") },
+            headlineContent = { Text("系统设置") },
+            supportingContent = { Text("关于、交流反馈等") },
             trailingContent = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null) },
             modifier = Modifier.clickable { navigator.onNavigate(Account.SystemAndUpdateSettings) },
         )
@@ -328,27 +326,6 @@ fun AccountSettingScreen(
             )
         }
 
-        val updateState by UpdateManager.updateState.collectAsState()
-        LaunchedEffect(updateState) {
-            val updateState = updateState
-            if (updateState is UpdateState.UpdateAvailable) {
-                val versionType = if (updateState.isNightly) "Nightly版本" else "正式版本"
-                Toast
-                    .makeText(
-                        context,
-                        "发现新$versionType ${updateState.version}",
-                        Toast.LENGTH_SHORT,
-                    ).show()
-            }
-            if (updateState is UpdateState.Error) {
-                Toast
-                    .makeText(
-                        context,
-                        "检查更新失败: ${updateState.message}",
-                        Toast.LENGTH_LONG,
-                    ).show()
-            }
-        }
         Row {
             Text(
                 "关于",
@@ -361,7 +338,7 @@ fun AccountSettingScreen(
                 onClick = {
                     val intent = Intent(
                         Intent.ACTION_VIEW,
-                        "https://github.com/zly2006/zhihu-deco".toUri(),
+                        "https://github.com/Asteroidmple/zhihu-deco".toUri(),
                     )
                     context.startActivity(intent)
                 },
@@ -374,7 +351,7 @@ fun AccountSettingScreen(
                 onClick = {
                     val intent = Intent(
                         Intent.ACTION_VIEW,
-                        "https://github.com/zly2006/zhihu-deco/blob/master/LICENSE.md".toUri(),
+                        "https://github.com/Asteroidmple/zhihu-deco/blob/master/LICENSE.md".toUri(),
                     )
                     context.startActivity(intent)
                 },

@@ -18,7 +18,7 @@ class LocalHomeFeedViewModel :
     private lateinit var recommendationEngine: LocalRecommendationEngine
 
     override val initialUrl: String
-        get() = error("LocalHomeFeedViewModel should not be used directly. Use LocalFeedViewModel instead.")
+        get() = "local://recommendation"
 
     override suspend fun fetchFeeds(context: Context) {
         try {
