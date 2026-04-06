@@ -20,9 +20,8 @@ import top.yukonga.miuix.kmp.theme.MiuixTheme as MiuixComposeTheme
 // 本地组合键
 // ============================================
 
-val LocalThemeStyle = compositionLocalOf { ThemeStyle.MATERIAL }
+val LocalThemeStyle = compositionLocalOf { com.github.zly2006.zhihu.theme.ThemeStyle.MATERIAL }
 val LocalUseDynamicColor = compositionLocalOf { true }
-val LocalUseMiuix = compositionLocalOf { false }
 
 // ============================================
 // 知乎主题包装器
@@ -96,10 +95,9 @@ fun ZhihuTheme(
     CompositionLocalProvider(
         LocalThemeStyle provides themeStyle,
         LocalUseDynamicColor provides useDynamicColor,
-        LocalUseMiuix provides useMiuix,
     ) {
         if (useMiuix) {
-            // MIUIX 主题 - 使用 MiuixComposeTheme
+            // MIUIX 主题
             MiuixComposeTheme(
                 content = content,
             )
