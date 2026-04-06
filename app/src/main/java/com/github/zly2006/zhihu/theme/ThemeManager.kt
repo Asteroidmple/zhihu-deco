@@ -11,6 +11,35 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.core.content.edit
 import com.github.zly2006.zhihu.ui.PREFERENCE_NAME
 
+// MIUIX 配色模式枚举
+enum class ColorSchemeMode {
+    SYSTEM,
+    LIGHT,
+    DARK,
+    MONET_SYSTEM,
+    MONET_LIGHT,
+    MONET_DARK,
+}
+
+// MIUIX 调色板风格
+enum class ThemePaletteStyle {
+    TONAL_SPOT,
+    NEUTRAL,
+    VIBRANT,
+    EXPRESSIVE,
+    RAINBOW,
+    FRUIT_SALAD,
+    MONOCHROME,
+    FIDELITY,
+    CONTENT,
+}
+
+// MIUIX 颜色规范版本
+enum class ThemeColorSpec {
+    SPEC_2021,
+    SPEC_2025,
+}
+
 enum class ThemeMode {
     LIGHT,
     DARK,
