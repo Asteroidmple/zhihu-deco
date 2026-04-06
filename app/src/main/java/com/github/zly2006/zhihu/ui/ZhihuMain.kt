@@ -44,7 +44,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
@@ -89,8 +88,6 @@ import com.github.zly2006.zhihu.Question
 import com.github.zly2006.zhihu.Search
 import com.github.zly2006.zhihu.SentenceSimilarityTest
 import com.github.zly2006.zhihu.TopLevelDestination
-import com.github.zly2006.zhihu.theme.MiuiSmoothCornerShape
-import com.github.zly2006.zhihu.theme.ThemeManager
 import com.github.zly2006.zhihu.theme.ZhihuTheme
 import com.github.zly2006.zhihu.ui.subscreens.AppearanceSettingsScreen
 import com.github.zly2006.zhihu.ui.subscreens.BlockedFeedHistoryScreen
@@ -216,7 +213,6 @@ fun ZhihuMain(modifier: Modifier = Modifier, navController: NavHostController) {
     var duo3HomeAccount by remember { mutableStateOf(preferences.getBoolean("duo3_home_account", false)) }
     var duo3HomeScrollTop by remember { mutableStateOf(preferences.getBoolean("duo3_home_scroll_top", false)) }
     var duo3NavStyle by remember { mutableStateOf(preferences.getBoolean("duo3_nav_style", false)) }
-    val useMiuix = remember { ThemeManager.getUseMiuixSync() }
     var tapToRefreshEnabled by remember { mutableStateOf(preferences.getBoolean("bottomBarTapRefresh", true)) }
     var tapToScrollToTopEnabled by remember { mutableStateOf(preferences.getBoolean("bottomBarTapScrollToTop", true)) }
     var autoHideBottomBar by remember { mutableStateOf(preferences.getBoolean("autoHideBottomBar", false)) }
@@ -329,12 +325,6 @@ fun ZhihuMain(modifier: Modifier = Modifier, navController: NavHostController) {
                         modifier = Modifier
                             .height(
                                 (if (duo3NavStyle) 64.dp else 56.dp) + bottomPadding,
-                            ).then(
-                                if (useMiuix) {
-                                    Modifier.clip(MiuiSmoothCornerShape(radius = 24.dp))
-                                } else {
-                                    Modifier
-                                },
                             ),
                     ) {
                         val allItems = if (duo3HomeAccount) {
@@ -396,14 +386,10 @@ fun ZhihuMain(modifier: Modifier = Modifier, navController: NavHostController) {
                                     }
                                 },
                                 alwaysShowLabel = duo3NavStyle,
-                                colors = if (duo3NavStyle || useMiuix) {
-                                    NavigationBarItemDefaults.colors()
-                                } else {
-                                    NavigationBarItemDefaults.colors(
-                                        selectedIconColor = Color(0xff66ccff),
-                                        indicatorColor = Color.Transparent,
-                                    )
-                                },
+                                colors = NavigationBarItemDefaults.colors(
+                                    selectedIconColor = Color(0xff66ccff),
+                                    indicatorColor = Color.Transparent,
+                                ),
                                 icon = {
                                     Icon(icon, contentDescription = label)
                                 },

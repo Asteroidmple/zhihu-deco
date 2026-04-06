@@ -1,6 +1,5 @@
 package com.github.zly2006.zhihu.theme
 
-import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 
@@ -71,77 +70,3 @@ val DarkColorScheme = darkColorScheme(
     inversePrimary = md_inverse_primary_dark,
     scrim = md_scrim_dark,
 )
-
-// ============================================
-// MIUIX 配色方案 (浅色)
-// ============================================
-
-val MiuixLightColorScheme: ColorScheme
-    get() = lightColorScheme(
-        primary = miuix_primary,
-        onPrimary = miuix_on_primary,
-        primaryContainer = miuix_primary_container,
-        onPrimaryContainer = miuix_on_primary_container,
-        secondary = miuix_secondary,
-        onSecondary = miuix_on_secondary,
-        secondaryContainer = miuix_secondary_container,
-        onSecondaryContainer = miuix_on_secondary_container,
-        tertiary = miuix_tertiary_container,
-        onTertiary = miuix_on_tertiary_container,
-        tertiaryContainer = miuix_tertiary_container,
-        onTertiaryContainer = miuix_on_tertiary_container,
-        error = miuix_error,
-        onError = miuix_on_error,
-        errorContainer = miuix_error_container,
-        onErrorContainer = miuix_on_error_container,
-        background = miuix_background,
-        onBackground = miuix_on_background,
-        surface = miuix_surface,
-        onSurface = miuix_on_surface,
-        surfaceVariant = miuix_surface_variant,
-        onSurfaceVariant = miuix_on_surface_secondary,
-        surfaceTint = miuix_primary,
-        outline = miuix_outline,
-        outlineVariant = miuix_divider,
-        inverseSurface = miuix_surface_dark_theme,
-        inverseOnSurface = miuix_on_surface_dark_theme,
-        inversePrimary = miuix_primary_dark_theme,
-        scrim = miuix_window_dimming,
-    )
-
-// ============================================
-// MIUIX 配色方案 (深色)
-// ============================================
-
-val MiuixDarkColorScheme: ColorScheme
-    get() = darkColorScheme(
-        primary = miuix_primary_dark_theme,
-        onPrimary = miuix_on_primary_dark_theme,
-        primaryContainer = miuix_primary_container_dark,
-        onPrimaryContainer = miuix_on_primary_container_dark,
-        secondary = miuix_secondary_dark_theme,
-        onSecondary = miuix_on_secondary_dark_theme,
-        secondaryContainer = miuix_secondary_container_dark,
-        onSecondaryContainer = miuix_on_secondary_container_dark,
-        tertiary = miuix_tertiary_container_dark,
-        onTertiary = miuix_on_tertiary_container_dark,
-        tertiaryContainer = miuix_tertiary_container_dark,
-        onTertiaryContainer = miuix_on_tertiary_container_dark,
-        error = miuix_error_dark_theme,
-        onError = miuix_on_error_dark_theme,
-        errorContainer = miuix_error_container_dark,
-        onErrorContainer = miuix_on_error_container_dark,
-        background = miuix_background_dark_theme,
-        onBackground = miuix_on_background_dark_theme,
-        surface = miuix_surface_dark_theme,
-        onSurface = miuix_on_surface_dark_theme,
-        surfaceVariant = miuix_surface_variant_dark,
-        onSurfaceVariant = miuix_on_surface_secondary_dark,
-        surfaceTint = miuix_primary_dark_theme,
-        outline = miuix_outline_dark,
-        outlineVariant = miuix_divider_dark,
-        inverseSurface = miuix_surface,
-        inverseOnSurface = miuix_on_surface,
-        inversePrimary = miuix_primary,
-        scrim = miuix_window_dimming_dark,
-    )

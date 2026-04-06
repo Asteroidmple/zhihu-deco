@@ -13,13 +13,3 @@ val Shapes = Shapes(
     medium = RoundedCornerShape(12.dp),
     large = RoundedCornerShape(16.dp),
 )
-
-// ============================================
-// MIUIX 形状系统
-// ============================================
-
-val MiuixShapes = Shapes(
-    small = RoundedCornerShape(10.dp),
-    medium = RoundedCornerShape(16.dp),
-    large = RoundedCornerShape(24.dp),
-)

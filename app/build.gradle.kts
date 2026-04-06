@@ -173,9 +173,6 @@ dependencies {
     implementation("com.google.android.material:material:1.13.0")
     implementation("com.materialkolor:material-kolor:4.1.1")
 
-    // Miuix Compose UI Library
-    implementation("top.yukonga.miuix.kmp:miuix:0.2.2")
-
     implementation("org.jsoup:jsoup:1.22.1")
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
 

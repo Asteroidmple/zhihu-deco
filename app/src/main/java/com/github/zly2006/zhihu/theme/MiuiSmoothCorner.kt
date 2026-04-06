@@ -89,21 +89,13 @@ object MiuiSmoothCorners {
 }
 
 @Composable
-fun cardShape(): androidx.compose.ui.graphics.Shape =
-    if (isMiuixTheme()) MiuiSmoothCorners.Medium else RoundedCornerShape(12.dp)
+fun cardShape(): androidx.compose.ui.graphics.Shape = RoundedCornerShape(12.dp)
 
 @Composable
-fun buttonShape(): androidx.compose.ui.graphics.Shape =
-    if (isMiuixTheme()) MiuiSmoothCorners.Small else RoundedCornerShape(8.dp)
+fun buttonShape(): androidx.compose.ui.graphics.Shape = RoundedCornerShape(8.dp)
 
 @Composable
-fun dialogShape(): androidx.compose.ui.graphics.Shape =
-    if (isMiuixTheme()) MiuiSmoothCorners.Large else RoundedCornerShape(16.dp)
+fun dialogShape(): androidx.compose.ui.graphics.Shape = RoundedCornerShape(16.dp)
 
 @Composable
-fun bottomSheetShape(): androidx.compose.ui.graphics.Shape =
-    if (isMiuixTheme()) {
-        RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)
-    } else {
-        RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
-    }
+fun bottomSheetShape(): androidx.compose.ui.graphics.Shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)

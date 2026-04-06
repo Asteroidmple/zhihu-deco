@@ -65,7 +65,6 @@ import com.github.zly2006.zhihu.BuildConfig
 import com.github.zly2006.zhihu.LocalNavigator
 import com.github.zly2006.zhihu.data.Feed
 import com.github.zly2006.zhihu.data.target
-import com.github.zly2006.zhihu.theme.MiuiSmoothCornerShape
 import com.github.zly2006.zhihu.theme.NeutralGray500
 import com.github.zly2006.zhihu.theme.ThemeManager
 import com.github.zly2006.zhihu.theme.ZhihuBlue
@@ -118,7 +117,6 @@ fun FeedCard(
     }
     val duo3CardAppearance = remember { preferences.getBoolean("duo3_card_appearance", false) }
     val duo3CardLayout = remember { preferences.getBoolean("duo3_card_layout", false) }
-    val useMiuix = remember { ThemeManager.getUseMiuixSync() }
 
     // 动画偏移量
     val animatedOffsetX by animateFloatAsState(
@@ -190,8 +188,6 @@ fun FeedCard(
                 },
                 shape = if (duo3CardAppearance) {
                     RoundedCornerShape(24.dp)
-                } else if (useMiuix) {
-                    MiuiSmoothCornerShape(radius = 16.dp)
                 } else {
                     CardDefaults.shape
                 },
