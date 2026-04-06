@@ -717,12 +717,14 @@ private fun getTagInfo(feed: Feed?, item: FeedDisplayItem): TagInfo {
     }
 
     // 如果 feed 或 target 为 null，使用 item.details 作为后备方案
-    return when (item.details) {
-        "回答" -> TagInfo("回答", ZhihuBlue)
-        "文章" -> TagInfo("文章", ZhihuGreen)
-        "视频" -> TagInfo("视频", ZhihuOrange)
-        "想法" -> TagInfo("想法", ZhihuRed)
-        "问题" -> TagInfo("问题", ZhihuBlue)
+    // 支持包含额外信息的 details 文本（如 "回答 · 2小时前"）
+    val details = item.details
+    return when {
+        details.contains("回答") -> TagInfo("回答", ZhihuBlue)
+        details.contains("文章") -> TagInfo("文章", ZhihuGreen)
+        details.contains("视频") -> TagInfo("视频", ZhihuOrange)
+        details.contains("想法") -> TagInfo("想法", ZhihuRed)
+        details.contains("问题") -> TagInfo("问题", ZhihuBlue)
         else -> TagInfo("其他", NeutralGray500)
     }
 }

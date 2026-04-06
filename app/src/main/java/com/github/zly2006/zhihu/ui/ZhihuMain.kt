@@ -58,7 +58,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.edit
+
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
@@ -125,7 +125,6 @@ fun ZhihuMain(modifier: Modifier = Modifier, navController: NavHostController) {
             }
         }
     }
-
     // 首次启动提示
     var showFilterExplainDialog by remember {
         mutableStateOf(!preferences.getBoolean("filterExplainDialogShown", false))
@@ -158,10 +157,10 @@ fun ZhihuMain(modifier: Modifier = Modifier, navController: NavHostController) {
     if (uiChanges && installed3Hours) {
         AlertDialog(
             onDismissRequest = {},
-            title = { Text("UI 新变化！") },
+            title = { Text("UI新变化！") },
             text = {
                 Text(
-                    "知乎 ++ 正在测试一套新的 UI。欢迎尝试。如有任何意见，请在 GitHub issues 提出。",
+                    "知乎++正在测试一套新的UI。欢迎尝试。如有任何意见，请在GitHub issues提出。",
                 )
             },
             dismissButton = {
@@ -194,7 +193,7 @@ fun ZhihuMain(modifier: Modifier = Modifier, navController: NavHostController) {
 //            confirmButton = {
 //                TextButton(onClick = {
 //                    showSurveyDialog = false
-//                    preferences.edit { putBoolean(keySurveyDone, true) }
+//                    preferences.edit().putBoolean(keySurveyDone, true).apply()
 //                    val intent = Intent(
 //                        Intent.ACTION_VIEW,
 //                        SURVEY_URL.toUri(),
@@ -207,7 +206,7 @@ fun ZhihuMain(modifier: Modifier = Modifier, navController: NavHostController) {
 //                    TextButton(onClick = { showSurveyDialog = false }) { Text("取消") }
 //                    TextButton(onClick = {
 //                        showSurveyDialog = false
-//                        preferences.edit { putBoolean(keySurveyDone, true) }
+//                        preferences.edit().putBoolean(keySurveyDone, true).apply()
 //                    }) { Text("我已填写") }
 //                }
 //            },
@@ -356,64 +355,65 @@ fun ZhihuMain(modifier: Modifier = Modifier, navController: NavHostController) {
                                 Triple(Account, "账号", Icons.Filled.ManageAccounts),
                             )
                         }
+                        val defaultKeys = if (duo3HomeAccount) {
+                            setOf(Home.name, Follow.name, Daily.name)
+                        } else {
+                            setOf(Home.name, Follow.name, Daily.name, OnlineHistory.name, Account.name)
+                        }
+                        val selectedKeys = preferences.getStringSet("bottom_bar_items", defaultKeys) ?: defaultKeys
+                        val bottomBarItems = allItems.filter { it.first.name in selectedKeys }
 
-                        allItems.forEach { item ->
-                            val selected = navEntry.destination.hasRoute(item.first::class)
+                        @Composable
+                        fun Item(
+                            destination: NavDestination,
+                            label: String,
+                            icon: androidx.compose.ui.graphics.vector.ImageVector,
+                        ) {
+                            val tag = "nav_tab_${(destination as? TopLevelDestination)?.name?.lowercase() ?: label.lowercase()}"
                             NavigationBarItem(
-                                selected = selected,
+                                navEntry.hasRoute(destination::class),
                                 onClick = {
-                                    if (selected) {
-                                        if (tapToRefreshEnabled && item.first == Home) {
-                                            refreshTrigger += 1
-                                        } else if (tapToScrollToTopEnabled) {
-                                            scrollToTopTrigger += 1
-                                        }
-                                    } else {
-                                        navController.navigate(item.first) {
-                                            popUpTo(0) {
-                                                inclusive = false
-                                                saveState = true
-                                            }
+                                    if (!navEntry.hasRoute(destination::class)) {
+                                        navController.navigate(destination) {
+                                            popUpTo(Home)
                                             launchSingleTop = true
                                             restoreState = true
                                         }
+                                    } else if (if (duo3HomeScrollTop) tapToScrollToTopEnabled else tapToRefreshEnabled) {
+                                        if (duo3HomeScrollTop) scrollToTopTrigger++ else refreshTrigger++
                                     }
                                 },
-                                icon = {
-                                    Icon(
-                                        imageVector = item.third,
-                                        contentDescription = item.second,
-                                        modifier = Modifier.testTag("nav_icon_${item.second}"),
-                                    )
-                                },
                                 label = {
-                                    Text(
-                                        text = item.second,
-                                        fontSize = 12.sp,
-                                        maxLines = 1,
-                                        style = LocalContentColor.current.let {
-                                            if (selected) {
-                                                TextStyle(
-                                                    color = it,
-                                                    fontSize = 12.sp,
-                                                )
-                                            } else {
-                                                TextStyle(
-                                                    color = it.copy(alpha = 0.6f),
-                                                    fontSize = 12.sp,
-                                                )
-                                            }
-                                        },
+                                    if (duo3NavStyle) {
+                                        Text(label)
+                                    } else {
+                                        Text(
+                                            label,
+                                            style = TextStyle(
+                                                fontSize = 9.sp,
+                                                color = LocalContentColor.current.copy(alpha = 0.6f),
+                                            ),
+                                        )
+                                    }
+                                },
+                                alwaysShowLabel = duo3NavStyle,
+                                colors = if (duo3NavStyle || useMiuix) {
+                                    NavigationBarItemDefaults.colors()
+                                } else {
+                                    NavigationBarItemDefaults.colors(
+                                        selectedIconColor = Color(0xff66ccff),
+                                        indicatorColor = Color.Transparent,
                                     )
                                 },
-                                colors = NavigationBarItemDefaults.colors(
-                                    selectedIconColor = LocalContentColor.current,
-                                    unselectedIconColor = LocalContentColor.current.copy(alpha = 0.6f),
-                                    selectedTextColor = LocalContentColor.current,
-                                    unselectedTextColor = LocalContentColor.current.copy(alpha = 0.6f),
-                                    indicatorColor = LocalContentColor.current.copy(alpha = 0.1f),
-                                ),
+                                icon = {
+                                    Icon(icon, contentDescription = label)
+                                },
+                                modifier = (if (duo3NavStyle) Modifier.padding(top = 4.dp) else Modifier).testTag(tag),
                             )
+                        }
+
+                        bottomBarItems.forEach { item ->
+                            Item(item.first, item.second, item.third)
                         }
                     }
                 }
@@ -421,50 +421,190 @@ fun ZhihuMain(modifier: Modifier = Modifier, navController: NavHostController) {
         },
     ) { innerPadding ->
         CompositionLocalProvider(
-            LocalNavigator provides Navigator(navController),
+            LocalNavigator provides Navigator(
+                onNavigate = activity::navigate,
+                onNavigateBack = navController::popBackStack,
+            ),
         ) {
             MyNavHost(
-                navController = navController,
-                modifier = Modifier.padding(innerPadding),
+                navController,
+                modifier = Modifier,
+                startDestination = Home,
                 enterTransition = {
                     val fromIndex = getPageIndex(initialState.destination)
                     val toIndex = getPageIndex(targetState.destination)
-                    val isPop = false
-                    val isEnter = true
-                    createSlideAnimation(isEnter, isPop, fromIndex, toIndex) as EnterTransition
+                    createSlideAnimation(isEnter = true, isPop = false, fromIndex, toIndex) as EnterTransition
                 },
                 exitTransition = {
                     val fromIndex = getPageIndex(initialState.destination)
                     val toIndex = getPageIndex(targetState.destination)
-                    val isPop = false
-                    val isEnter = false
-                    createSlideAnimation(isEnter, isPop, fromIndex, toIndex) as ExitTransition
+                    createSlideAnimation(isEnter = false, isPop = false, fromIndex, toIndex) as ExitTransition
                 },
                 popEnterTransition = {
                     val fromIndex = getPageIndex(initialState.destination)
                     val toIndex = getPageIndex(targetState.destination)
-                    val isPop = true
-                    val isEnter = true
-                    createSlideAnimation(isEnter, isPop, fromIndex, toIndex) as EnterTransition
+                    createSlideAnimation(isEnter = true, isPop = true, fromIndex, toIndex) as EnterTransition
                 },
                 popExitTransition = {
                     val fromIndex = getPageIndex(initialState.destination)
                     val toIndex = getPageIndex(targetState.destination)
-                    val isPop = true
-                    val isEnter = false
-                    createSlideAnimation(isEnter, isPop, fromIndex, toIndex) as ExitTransition
+                    createSlideAnimation(isEnter = false, isPop = true, fromIndex, toIndex) as ExitTransition
                 },
-            )
+            ) {
+                composable<Home> {
+                    HomeScreen(
+                        refreshTrigger = refreshTrigger,
+                        scrollToTopTrigger = scrollToTopTrigger,
+                        innerPadding = innerPadding,
+                    )
+                }
+                composable<Question> { navEntry ->
+                    val question: Question = navEntry.toRoute()
+                    QuestionScreen(question, innerPadding)
+                }
+                composable<Article>(
+                    enterTransition = {
+                        val sharedData = try {
+                            ViewModelProvider(activity)[ArticleViewModel.ArticlesSharedData::class.java]
+                        } catch (_: Exception) {
+                            null
+                        }
+                        when (sharedData?.answerTransitionDirection) {
+                            ArticleViewModel.AnswerTransitionDirection.VERTICAL_NEXT ->
+                                slideInVertically(tween(300)) { it } + fadeIn(tween(300))
+                            ArticleViewModel.AnswerTransitionDirection.VERTICAL_PREVIOUS ->
+                                slideInVertically(tween(300)) { -it } + fadeIn(tween(300))
+                            ArticleViewModel.AnswerTransitionDirection.HORIZONTAL_NEXT ->
+                                slideInHorizontally(tween(300)) { it } + fadeIn(tween(300))
+                            ArticleViewModel.AnswerTransitionDirection.HORIZONTAL_PREVIOUS ->
+                                slideInHorizontally(tween(300)) { -it } + fadeIn(tween(300))
+                            else -> slideInHorizontally(tween(300)) { it }
+                        }
+                    },
+                    exitTransition = {
+                        val sharedData = try {
+                            (activity as? androidx.activity.ComponentActivity)
+                                ?.let { ViewModelProvider(it)[ArticleViewModel.ArticlesSharedData::class.java] }
+                        } catch (_: Exception) {
+                            null
+                        }
+                        when (sharedData?.answerTransitionDirection) {
+                            ArticleViewModel.AnswerTransitionDirection.VERTICAL_NEXT ->
+                                slideOutVertically(tween(300)) { -it } + fadeOut(tween(300))
+                            ArticleViewModel.AnswerTransitionDirection.VERTICAL_PREVIOUS ->
+                                slideOutVertically(tween(300)) { it } + fadeOut(tween(300))
+                            ArticleViewModel.AnswerTransitionDirection.HORIZONTAL_NEXT ->
+                                slideOutHorizontally(tween(300)) { -it } + fadeOut(tween(300))
+                            ArticleViewModel.AnswerTransitionDirection.HORIZONTAL_PREVIOUS ->
+                                slideOutHorizontally(tween(300)) { it } + fadeOut(tween(300))
+                            else -> ExitTransition.None
+                        }
+                    },
+                ) { navEntry ->
+                    val article: Article = navEntry.toRoute()
+                    val viewModel: ArticleViewModel = viewModel(navEntry) {
+                        ArticleViewModel(article, activity.httpClient, navEntry)
+                    }
+                    ArticleScreen(article, viewModel, innerPadding)
+                }
+                composable<HotList> {
+                    HotListScreen(innerPadding)
+                }
+                composable<Follow> {
+                    FollowScreen(innerPadding)
+                }
+                composable<Daily> {
+                    DailyScreen(innerPadding)
+                }
+                composable<History> {
+                    HistoryScreen(innerPadding)
+                }
+                composable<OnlineHistory> {
+                    OnlineHistoryScreen(innerPadding)
+                }
+                composable<Account> {
+                    AccountSettingScreen(innerPadding)
+                }
+                composable<Search> { navEntry ->
+                    val search: Search = navEntry.toRoute()
+                    SearchScreen(innerPadding, search)
+                }
+                composable<Collections> {
+                    val data: Collections = it.toRoute()
+                    CollectionScreen(data.userToken, innerPadding)
+                }
+                composable<CollectionContent> {
+                    val content: CollectionContent = it.toRoute()
+                    CollectionContentScreen(content.collectionId, innerPadding)
+                }
+                composable<Person> {
+                    val person: Person = it.toRoute()
+                    PeopleScreen(innerPadding, person)
+                }
+                composable<Pin> {
+                    val pin = it.toRoute<Pin>()
+                    PinScreen(innerPadding, pin)
+                }
+                composable<Account.RecommendSettings.Blocklist> {
+                    BlocklistSettingsScreen(innerPadding)
+                }
+                composable<Account.RecommendSettings.BlockedFeedHistory> {
+                    BlockedFeedHistoryScreen()
+                }
+                composable<Notification> {
+                    NotificationScreen(innerPadding)
+                }
+                composable<Notification.NotificationSettings> {
+                    NotificationSettingsScreen(innerPadding)
+                }
+                composable<SentenceSimilarityTest> {
+                    SentenceSimilarityTestScreen(innerPadding)
+                }
+                composable<Account.AppearanceSettings> {
+                    val args = it.toRoute<Account.AppearanceSettings>()
+                    AppearanceSettingsScreen(
+                        innerPadding,
+                        setting = args.setting,
+                    )
+                }
+                composable<Account.RecommendSettings> {
+                    val args = it.toRoute<Account.RecommendSettings>()
+                    ContentFilterSettingsScreen(
+                        innerPadding,
+                        setting = args.setting,
+                    )
+                }
+                composable<Account.SystemAndUpdateSettings> {
+                    SystemAndUpdateSettingsScreen(innerPadding)
+                }
+                composable<Account.DeveloperSettings> {
+                    DeveloperSettingsScreen(innerPadding)
+                }
+                composable<Account.DeveloperSettings.ColorScheme> {
+                    ColorSchemeScreen(innerPadding)
+                }
+            }
         }
     }
 }
 
-fun isTopLevelDest(it: NavBackStackEntry): Boolean =
-    it.destination.route in listOf(
-        "Home",
-        "Follow",
-        "HotList",
-        "Daily",
-        "OnlineHistory",
-        "Account",
-    )
+private fun isTopLevelDest(navEntry: NavBackStackEntry?): Boolean = navEntry.hasRoute(Home::class) ||
+    navEntry.hasRoute(Follow::class) ||
+    navEntry.hasRoute(HotList::class) ||
+    navEntry.hasRoute(Daily::class) ||
+    navEntry.hasRoute(OnlineHistory::class) ||
+    navEntry.hasRoute(Account::class)
+
+internal fun NavBackStackEntry?.hasRoute(cls: KClass<out NavDestination>): Boolean {
+    val dest = this?.destination ?: return false
+    return dest.hierarchy.any { it.hasRoute(cls) }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun GreetingPreview() {
+    val navController = rememberNavController()
+    ZhihuTheme {
+        ZhihuMain(navController = navController)
+    }
+}

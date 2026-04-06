@@ -2,20 +2,15 @@ package com.github.zly2006.zhihu.viewmodel.feed
 
 import android.content.Context
 import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.setValue
 import com.github.zly2006.zhihu.Article
 import com.github.zly2006.zhihu.ArticleType
 import com.github.zly2006.zhihu.MainActivity
 import com.github.zly2006.zhihu.NavDestination
 import com.github.zly2006.zhihu.Person
-import com.github.zly2006.zhihu.Pin
 import com.github.zly2006.zhihu.Question
-import com.github.zly2006.zhihu.Video
 import com.github.zly2006.zhihu.data.CommonFeed
 import com.github.zly2006.zhihu.data.Feed
+import com.github.zly2006.zhihu.data.target
 import com.github.zly2006.zhihu.data.Person as DataPerson
 
 class HistoryViewModel : BaseFeedViewModel() {
@@ -23,35 +18,11 @@ class HistoryViewModel : BaseFeedViewModel() {
         private const val TAG = "HistoryViewModel"
     }
 
-    enum class ItemType {
-        ANSWER,
-        ARTICLE,
-        QUESTION,
-        PERSON,
-        PIN,
-        VIDEO,
-        OTHER,
-    }
-
-    data class HistoryDisplayItem(
-        val title: String,
-        val summary: String?,
-        val details: String,
-        val feed: Feed?,
-        val navDestination: NavDestination?,
-        val avatarSrc: String? = null,
-        val authorName: String? = null,
-        val itemType: ItemType,
-    )
-
-    var historyDisplayItems = mutableStateListOf<HistoryDisplayItem>()
-    var selectedTabIndex by mutableIntStateOf(0)
-
     override val initialUrl: String
         get() = error("不需要 URL")
 
     override val isEnd: Boolean
-        get() = historyDisplayItems.isNotEmpty()
+        get() = displayItems.isNotEmpty()
 
     override fun refresh(context: Context) {
         if (isLoading) return
@@ -59,42 +30,33 @@ class HistoryViewModel : BaseFeedViewModel() {
         errorMessage = null
 
         val history = (context as MainActivity).history
-        historyDisplayItems.clear()
         displayItems.clear()
 
         Log.d(TAG, "开始加载历史记录，总数：${history.history.size}")
 
         history.history.forEachIndexed { index, dest ->
-            val displayItem = createHistoryDisplayItem(dest)
-            displayItem?.let { item ->
-                historyDisplayItems.add(item)
-                // 同时添加到父类的displayItems以保持兼容性
-                displayItems.add(
-                    FeedDisplayItem(
-                        title = item.title,
-                        summary = item.summary,
-                        details = item.details,
-                        feed = item.feed,
-                        navDestination = item.navDestination,
-                        avatarSrc = item.avatarSrc,
-                        authorName = item.authorName,
-                    ),
-                )
-                Log.d(TAG, "[$index] 创建 Feed: ${dest::class.simpleName}, type: ${item.itemType}")
+            val displayItem = createFeedDisplayItem(dest)
+            displayItem?.let {
+                displayItems.add(it)
+                val targetClass = it.feed
+                    ?.target
+                    ?.javaClass
+                    ?.simpleName ?: "null"
+                Log.d(TAG, "[$index] 创建 Feed: ${dest::class.simpleName}, target: $targetClass")
             } ?: run {
                 Log.w(TAG, "[$index] 无法创建 FeedDisplayItem: ${dest::class.simpleName}")
             }
         }
 
-        Log.d(TAG, "历史记录加载完成，displayItems 数量：${historyDisplayItems.size}")
+        Log.d(TAG, "历史记录加载完成，displayItems 数量：${displayItems.size}")
         isLoading = false
     }
 
-    private fun createHistoryDisplayItem(dest: NavDestination): HistoryDisplayItem? = when (dest) {
+    private fun createFeedDisplayItem(dest: NavDestination): FeedDisplayItem? = when (dest) {
         is Article -> {
             if (dest.type == ArticleType.Answer) {
                 // 回答 - 创建 AnswerTarget
-                val answerTarget = Feed.AnswerTarget(
+                val target = Feed.AnswerTarget(
                     id = dest.id,
                     url = "https://www.zhihu.com/answer/${dest.id}",
                     author = null,
@@ -119,10 +81,10 @@ class HistoryViewModel : BaseFeedViewModel() {
                 val feed = CommonFeed(
                     id = "history_answer_${dest.id}",
                     verb = "ANSWER_CREATE",
-                    target = answerTarget,
+                    target = target,
                 )
 
-                HistoryDisplayItem(
+                FeedDisplayItem(
                     title = dest.title,
                     summary = dest.excerpt ?: "",
                     details = "回答",
@@ -130,11 +92,10 @@ class HistoryViewModel : BaseFeedViewModel() {
                     feed = feed,
                     avatarSrc = dest.avatarSrc,
                     navDestination = dest,
-                    itemType = ItemType.ANSWER,
                 )
             } else {
                 // 文章 - 创建 ArticleTarget
-                val articleTarget = Feed.ArticleTarget(
+                val target = Feed.ArticleTarget(
                     id = dest.id,
                     url = "https://zhuanlan.zhihu.com/p/${dest.id}",
                     author = DataPerson(
@@ -166,10 +127,10 @@ class HistoryViewModel : BaseFeedViewModel() {
                 val feed = CommonFeed(
                     id = "history_article_${dest.id}",
                     verb = "ARTICLE_CREATE",
-                    target = articleTarget,
+                    target = target,
                 )
 
-                HistoryDisplayItem(
+                FeedDisplayItem(
                     title = dest.title,
                     summary = dest.excerpt ?: "",
                     details = "文章",
@@ -177,13 +138,12 @@ class HistoryViewModel : BaseFeedViewModel() {
                     feed = feed,
                     avatarSrc = dest.avatarSrc,
                     navDestination = dest,
-                    itemType = ItemType.ARTICLE,
                 )
             }
         }
         is Question -> {
             // 问题 - 创建 QuestionTarget
-            val questionTarget = Feed.QuestionTarget(
+            val target = Feed.QuestionTarget(
                 id = dest.questionId,
                 _title = dest.title,
                 url = "https://www.zhihu.com/question/${dest.questionId}",
@@ -196,21 +156,20 @@ class HistoryViewModel : BaseFeedViewModel() {
             val feed = CommonFeed(
                 id = "history_question_${dest.questionId}",
                 verb = "QUESTION_CREATE",
-                target = questionTarget,
+                target = target,
             )
 
-            HistoryDisplayItem(
+            FeedDisplayItem(
                 title = dest.title,
                 details = "问题",
                 feed = feed,
                 navDestination = dest,
                 summary = "",
-                itemType = ItemType.QUESTION,
             )
         }
         is Person -> {
             // 用户 - 创建 PinTarget
-            val pinTarget = Feed.PinTarget(
+            val target = Feed.PinTarget(
                 id = dest.id.toLongOrNull() ?: 0,
                 url = "https://www.zhihu.com/people/${dest.urlToken}",
                 author = DataPerson(
@@ -235,38 +194,15 @@ class HistoryViewModel : BaseFeedViewModel() {
             val feed = CommonFeed(
                 id = "history_person_${dest.id}",
                 verb = "PEOPLE_CREATE",
-                target = pinTarget,
+                target = target,
             )
 
-            HistoryDisplayItem(
+            FeedDisplayItem(
                 title = dest.name,
                 details = "用户",
                 feed = feed,
                 navDestination = dest,
                 summary = "",
-                itemType = ItemType.PERSON,
-            )
-        }
-        is Pin -> {
-            // 想法
-            HistoryDisplayItem(
-                title = "想法",
-                details = "想法",
-                feed = null,
-                navDestination = dest,
-                summary = "",
-                itemType = ItemType.PIN,
-            )
-        }
-        is Video -> {
-            // 视频
-            HistoryDisplayItem(
-                title = "视频",
-                details = "视频",
-                feed = null,
-                navDestination = dest,
-                summary = "",
-                itemType = ItemType.VIDEO,
             )
         }
         else -> {
