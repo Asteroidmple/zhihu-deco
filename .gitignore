@@ -42,5 +42,27 @@ google-services.json
 .tmp/
 /.trae
 
+# IDE specific files
+.claude/
+.trae-skills/
+.trae-cn-skills/
+
 # Oh my codex
 .omx/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Unused Rust projects (replaced by sentence_embeddings)
+rs-hf-tokenizer/
+rs-zse-sign/
+apk-recompress/
+
+# Unused misc files
+misc/emoji.py
+misc/tampermonkey.js
+misc/htk-inject-system-cert.sh
+misc/icon.svg
+misc/zse-ck-v4-*.js
