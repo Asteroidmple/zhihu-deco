@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.Whatshot
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
@@ -102,7 +103,8 @@ import com.github.zly2006.zhihu.ui.NavHost as MyNavHost
 @SuppressLint("RestrictedApi")
 @Composable
 fun ZhihuMain(modifier: Modifier = Modifier, navController: NavHostController) {
-    val bottomPadding = ScaffoldDefaults.contentWindowInsets.asPaddingValues().calculateBottomPadding()
+    // Edge-to-Edge: Scaffold 会自动处理系统栏 Insets
+    // 不需要手动计算 bottomPadding，Scaffold 的 innerPadding 已包含
     val activity = LocalActivity.current as MainActivity
     val context = LocalContext.current
     val preferences = remember { context.getSharedPreferences(PREFERENCE_NAME, android.content.Context.MODE_PRIVATE) }
@@ -323,9 +325,7 @@ fun ZhihuMain(modifier: Modifier = Modifier, navController: NavHostController) {
                 ) {
                     NavigationBar(
                         modifier = Modifier
-                            .height(
-                                (if (duo3NavStyle) 64.dp else 56.dp) + bottomPadding,
-                            ),
+                            .height(if (duo3NavStyle) 80.dp else 56.dp),
                     ) {
                         val allItems = if (duo3HomeAccount) {
                             listOf(
@@ -387,7 +387,7 @@ fun ZhihuMain(modifier: Modifier = Modifier, navController: NavHostController) {
                                 },
                                 alwaysShowLabel = duo3NavStyle,
                                 colors = NavigationBarItemDefaults.colors(
-                                    selectedIconColor = Color(0xff66ccff),
+                                    selectedIconColor = MaterialTheme.colorScheme.primary,
                                     indicatorColor = Color.Transparent,
                                 ),
                                 icon = {

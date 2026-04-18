@@ -1,10 +1,7 @@
 package com.github.zly2006.zhihu.ui.components
 
 import android.content.Context.MODE_PRIVATE
-import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -54,14 +51,14 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.github.zly2006.zhihu.Account
-import com.zhihu.deco.BuildConfig
 import com.github.zly2006.zhihu.LocalNavigator
 import com.github.zly2006.zhihu.data.Feed
 import com.github.zly2006.zhihu.data.target
@@ -75,12 +72,13 @@ import com.github.zly2006.zhihu.ui.PREFERENCE_NAME
 import com.github.zly2006.zhihu.util.parseHtmlTextWithTheme
 import com.github.zly2006.zhihu.viewmodel.feed.BaseFeedViewModel
 import com.github.zly2006.zhihu.viewmodel.feed.BaseFeedViewModel.FeedDisplayItem
+import com.github.zly2006.zhihu.BuildConfig
+import android.util.Log
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
-@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun FeedCard(
     item: BaseFeedViewModel.FeedDisplayItem,
@@ -98,8 +96,8 @@ fun FeedCard(
     val density = LocalDensity.current
     val context = LocalContext.current
     var offsetX by remember { mutableFloatStateOf(0f) }
-    var currentY by remember { mutableFloatStateOf(0f) } // 当前手指Y位置
-    var startY by remember { mutableFloatStateOf(0f) } // 开始滑动时的Y位置
+    var currentY by remember { mutableFloatStateOf(0f) }
+    var startY by remember { mutableFloatStateOf(0f) }
     var isDragging by remember { mutableStateOf(false) }
     var showMenu by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
@@ -118,30 +116,29 @@ fun FeedCard(
     val duo3CardAppearance = remember { preferences.getBoolean("duo3_card_appearance", false) }
     val duo3CardLayout = remember { preferences.getBoolean("duo3_card_layout", false) }
 
-    // 动画偏移量
     val animatedOffsetX by animateFloatAsState(
         targetValue = if (isDragging) offsetX else 0f,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessMediumLow,
+        animationSpec = tween(
+            durationMillis = 300,
+            delayMillis = 0,
         ),
         label = "offsetAnimation",
     )
 
-    // 操作区域的透明度动画
     val actionAlpha by animateFloatAsState(
         targetValue = if (abs(animatedOffsetX) > 50f) (abs(animatedOffsetX) - 50f) / 100f else 0f,
         animationSpec = tween(150),
         label = "actionAlpha",
     )
 
-    // 根据横向滑动距离和纵向位置确定当前操作类型
     val currentAction = when {
-        abs(animatedOffsetX) < 75f -> "none" // 横向滑动不够，无操作
-        currentY - startY < -30f -> "like" // 手指向上，喜欢
-        currentY - startY > 30f -> "dislike" // 手指向下，不喜欢
-        else -> "neutral" // 中间位置，待定
+        abs(animatedOffsetX) < 75f -> "none"
+        currentY - startY < -30f -> "like"
+        currentY - startY > 30f -> "dislike"
+        else -> "neutral"
     }
+
+    val actionColors = remember { FeedActionColors() }
 
     if (feedCardStyle == "divider") {
         Column(
@@ -212,10 +209,10 @@ fun FeedCard(
                                     onDragEnd = {
                                         isDragging = false
                                         when {
-                                            abs(offsetX) >= 75f && currentY - startY < -30f && onLike != null -> {
+                                            abs(offsetX) >= 75f && currentY - startY < -30f -> {
                                                 onLike(item)
                                             }
-                                            abs(offsetX) >= 75f && currentY - startY > 30f && onDislike != null -> {
+                                            abs(offsetX) >= 75f && currentY - startY > 30f -> {
                                                 onDislike(item)
                                             }
                                         }
@@ -268,9 +265,9 @@ fun FeedCard(
                         .matchParentSize()
                         .background(
                             color = when (currentAction) {
-                                "like" -> Color(0xFF4CAF50).copy(alpha = actionAlpha * 0.2f)
-                                "dislike" -> Color(0xFFFF5722).copy(alpha = actionAlpha * 0.2f)
-                                "neutral" -> Color(0xFF9E9E9E).copy(alpha = actionAlpha * 0.1f)
+                                "like" -> actionColors.likeBackground.copy(alpha = actionAlpha * 0.2f)
+                                "dislike" -> actionColors.dislikeBackground.copy(alpha = actionAlpha * 0.2f)
+                                "neutral" -> actionColors.neutralBackground.copy(alpha = actionAlpha * 0.1f)
                                 else -> Color.Transparent
                             },
                             shape = RoundedCornerShape(12.dp),
@@ -290,7 +287,7 @@ fun FeedCard(
                                 Icon(
                                     imageVector = Icons.Default.Favorite,
                                     contentDescription = "喜欢",
-                                    tint = Color(0xFF4CAF50),
+                                    tint = actionColors.likeIcon,
                                     modifier = Modifier
                                         .size(32.dp)
                                         .scale(1f + actionAlpha * 0.3f),
@@ -298,9 +295,8 @@ fun FeedCard(
                                 Spacer(modifier = Modifier.width(12.dp))
                                 Text(
                                     text = "向上滑动 - 喜欢",
-                                    color = Color(0xFF4CAF50),
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 14.sp,
+                                    color = actionColors.likeText,
+                                    style = MaterialTheme.typography.labelLarge,
                                     modifier = Modifier.scale(1f + actionAlpha * 0.2f),
                                 )
                             }
@@ -308,7 +304,7 @@ fun FeedCard(
                                 Icon(
                                     imageVector = Icons.Default.ThumbDown,
                                     contentDescription = "不喜欢",
-                                    tint = Color(0xFFFF5722),
+                                    tint = actionColors.dislikeIcon,
                                     modifier = Modifier
                                         .size(32.dp)
                                         .scale(1f + actionAlpha * 0.3f),
@@ -316,18 +312,16 @@ fun FeedCard(
                                 Spacer(modifier = Modifier.width(12.dp))
                                 Text(
                                     text = "向下滑动 - 不喜欢",
-                                    color = Color(0xFFFF5722),
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 14.sp,
+                                    color = actionColors.dislikeText,
+                                    style = MaterialTheme.typography.labelLarge,
                                     modifier = Modifier.scale(1f + actionAlpha * 0.2f),
                                 )
                             }
                             "neutral" -> {
                                 Text(
                                     text = "上下滑动选择",
-                                    color = Color(0xFF9E9E9E),
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 14.sp,
+                                    color = actionColors.neutralText,
+                                    style = MaterialTheme.typography.labelLarge,
                                     modifier = Modifier.scale(1f + actionAlpha * 0.2f),
                                 )
                             }
@@ -337,6 +331,32 @@ fun FeedCard(
             }
         }
     }
+}
+
+private class FeedActionColors {
+    val likeBackground: Color
+        @Composable get() = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
+    
+    val dislikeBackground: Color
+        @Composable get() = MaterialTheme.colorScheme.error.copy(alpha = 0.08f)
+    
+    val neutralBackground: Color
+        @Composable get() = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f)
+    
+    val likeIcon: Color
+        @Composable get() = MaterialTheme.colorScheme.primary
+    
+    val dislikeIcon: Color
+        @Composable get() = MaterialTheme.colorScheme.error
+    
+    val likeText: Color
+        @Composable get() = MaterialTheme.colorScheme.primary
+    
+    val dislikeText: Color
+        @Composable get() = MaterialTheme.colorScheme.error
+    
+    val neutralText: Color
+        @Composable get() = MaterialTheme.colorScheme.onSurfaceVariant
 }
 
 @Composable
@@ -352,70 +372,91 @@ private fun FeedCardMenuBox(
     Box {
         IconButton(
             onClick = { onShowMenuChange(true) },
-            modifier = Modifier.size(24.dp),
+            modifier = Modifier
+                .size(48.dp)
+                .semantics { contentDescription = "更多选项" },
         ) {
             Icon(
                 imageVector = Icons.Default.MoreVert,
-                contentDescription = "更多选项",
+                contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.size(16.dp),
+                modifier = Modifier.size(24.dp),
             )
         }
         DropdownMenu(
             expanded = showMenu,
             onDismissRequest = { onShowMenuChange(false) },
         ) {
-            @Suppress("SimplifyBooleanWithConstants", "KotlinConstantConditions")
-            if (onBlockByKeywords != null && !BuildConfig.IS_LITE) {
-                DropdownMenuItem(
-                    text = { Text("按关键词屏蔽") },
-                    onClick = {
-                        onShowMenuChange(false)
-                        onBlockByKeywords(item)
-                    },
-                )
-            }
-            DropdownMenuItem(
-                text = { Text("屏蔽用户") },
-                onClick = {
-                    onShowMenuChange(false)
-                    onBlockUser?.invoke(item)
-                },
+            DropdownMenuContent(
+                item = item,
+                onShowMenuChange = onShowMenuChange,
+                onBlockUser = onBlockUser,
+                onBlockByKeywords = onBlockByKeywords,
+                onBlockTopic = onBlockTopic,
+                navigator = navigator,
             )
-            if (onBlockTopic != null && item.raw != null) {
-                val topics = when (val raw = item.raw) {
-                    is com.github.zly2006.zhihu.data.DataHolder.Answer -> raw.question.topics
-                    is com.github.zly2006.zhihu.data.DataHolder.Question -> raw.topics
-                    is com.github.zly2006.zhihu.data.DataHolder.Article -> raw.topics ?: emptyList()
-                    else -> emptyList()
-                }
-                topics.forEach { topic ->
-                    DropdownMenuItem(
-                        text = { Text("屏蔽「${topic.name}」") },
-                        onClick = {
-                            onShowMenuChange(false)
-                            onBlockTopic(topic.id, topic.name)
-                        },
-                    )
-                }
-            }
-            DropdownMenuItem(
-                text = { Text("外观设置") },
-                onClick = {
-                    onShowMenuChange(false)
-                    navigator.onNavigate(Account.AppearanceSettings())
-                },
-            )
-            if (item.isFiltered) {
-                DropdownMenuItem(
-                    text = { Text("不再屏蔽低赞内容") },
-                    onClick = {
-                        onShowMenuChange(false)
-                        navigator.onNavigate(Account.RecommendSettings("enableQualityFilter"))
-                    },
-                )
-            }
         }
+    }
+}
+
+@Composable
+private fun DropdownMenuContent(
+    item: BaseFeedViewModel.FeedDisplayItem,
+    onShowMenuChange: (Boolean) -> Unit,
+    onBlockUser: ((BaseFeedViewModel.FeedDisplayItem) -> Unit)?,
+    onBlockByKeywords: ((BaseFeedViewModel.FeedDisplayItem) -> Unit)?,
+    onBlockTopic: ((topicId: String, topicName: String) -> Unit)?,
+    navigator: com.github.zly2006.zhihu.Navigator,
+) {
+    @Suppress("SimplifyBooleanWithConstants", "KotlinConstantConditions")
+    if (onBlockByKeywords != null && !BuildConfig.IS_LITE) {
+        DropdownMenuItem(
+            text = { Text("按关键词屏蔽") },
+            onClick = {
+                onShowMenuChange(false)
+                onBlockByKeywords(item)
+            },
+        )
+    }
+    DropdownMenuItem(
+        text = { Text("屏蔽用户") },
+        onClick = {
+            onShowMenuChange(false)
+            onBlockUser?.invoke(item)
+        },
+    )
+    if (onBlockTopic != null && item.raw != null) {
+        val topics = when (val raw = item.raw) {
+            is com.github.zly2006.zhihu.data.DataHolder.Answer -> raw.question.topics
+            is com.github.zly2006.zhihu.data.DataHolder.Question -> raw.topics
+            is com.github.zly2006.zhihu.data.DataHolder.Article -> raw.topics ?: emptyList()
+            else -> emptyList()
+        }
+        topics.forEach { topic ->
+            DropdownMenuItem(
+                text = { Text("屏蔽「${topic.name}」") },
+                onClick = {
+                    onShowMenuChange(false)
+                    onBlockTopic(topic.id, topic.name)
+                },
+            )
+        }
+    }
+    DropdownMenuItem(
+        text = { Text("外观设置") },
+        onClick = {
+            onShowMenuChange(false)
+            navigator.onNavigate(Account.AppearanceSettings())
+        },
+    )
+    if (item.isFiltered) {
+        DropdownMenuItem(
+            text = { Text("不再屏蔽低赞内容") },
+            onClick = {
+                onShowMenuChange(false)
+                navigator.onNavigate(Account.RecommendSettings("enableQualityFilter"))
+            },
+        )
     }
 }
 
@@ -433,15 +474,13 @@ private fun FeedCardContent(
 ) {
     val navigator = LocalNavigator.current
     if (duo3CardLayout) {
-        // ── 新排版（duo3）────────────────────────────────────────────────────
         if (!item.title.isEmpty()) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                // 内容类型标签
                 val tagInfo = getTagInfo(item.feed, item)
                 Text(
                     text = tagInfo.text,
                     fontSize = 12.sp,
-                    color = Color.White,
+                    color = tagInfo.textColor,
                     modifier = Modifier
                         .padding(end = 6.dp)
                         .background(tagInfo.backgroundColor, RoundedCornerShape(4.dp)),
@@ -471,7 +510,7 @@ private fun FeedCardContent(
                     Spacer(modifier = Modifier.width(8.dp))
                     AsyncImage(
                         model = thumbnailUrl,
-                        contentDescription = "Thumbnail",
+                        contentDescription = "缩略图",
                         modifier = Modifier
                             .padding(top = 8.dp)
                             .sizeIn(maxHeight = 80.dp, maxWidth = 128.dp)
@@ -493,7 +532,7 @@ private fun FeedCardContent(
                             item.avatarSrc.let {
                                 AsyncImage(
                                     model = it,
-                                    contentDescription = "Avatar",
+                                    contentDescription = "作者头像",
                                     modifier = Modifier.clip(CircleShape).size(24.dp),
                                 )
                                 Spacer(Modifier.width(8.dp))
@@ -523,23 +562,20 @@ private fun FeedCardContent(
             }
         }
     } else {
-        // ── 原始排版（master）────────────────────────────────────────────────
         if (!item.title.isEmpty() && !item.isFiltered) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                // 内容类型标签
                 val tagInfo = getTagInfo(item.feed, item)
                 Text(
                     text = tagInfo.text,
                     fontSize = 12.sp,
-                    color = Color.White,
+                    color = tagInfo.textColor,
                     modifier = Modifier
                         .padding(end = 6.dp)
                         .background(tagInfo.backgroundColor, RoundedCornerShape(4.dp)),
                 )
                 Text(
                     text = parseHtmlTextWithTheme(item.title),
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleMedium,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -554,14 +590,14 @@ private fun FeedCardContent(
                 item.avatarSrc.let {
                     AsyncImage(
                         model = it,
-                        contentDescription = "Avatar",
+                        contentDescription = "作者头像",
                         modifier = Modifier.clip(CircleShape).size(20.dp),
                     )
                     Spacer(Modifier.width(8.dp))
                 }
                 Text(
                     text = item.authorName,
-                    fontSize = 14.sp,
+                    style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -574,8 +610,7 @@ private fun FeedCardContent(
         if (!item.summary.isNullOrBlank()) {
             Text(
                 text = parseHtmlTextWithTheme(item.summary),
-                fontSize = 14.sp,
-                lineHeight = 20.sp,
+                style = MaterialTheme.typography.bodyMedium,
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.padding(
@@ -594,8 +629,7 @@ private fun FeedCardContent(
             if (item.details.isNotEmpty()) {
                 Text(
                     text = item.details,
-                    fontSize = 12.sp,
-                    lineHeight = 16.sp,
+                    style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -606,69 +640,29 @@ private fun FeedCardContent(
             Box {
                 IconButton(
                     onClick = { onShowMenuChange(true) },
-                    modifier = Modifier.size(36.dp),
+                    modifier = Modifier
+                        .size(48.dp)
+                        .semantics { contentDescription = "更多选项" },
                 ) {
                     Icon(
                         imageVector = Icons.Default.MoreVert,
-                        contentDescription = "更多选项",
+                        contentDescription = null,
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(20.dp),
+                        modifier = Modifier.size(24.dp),
                     )
                 }
                 DropdownMenu(
                     expanded = showMenu,
                     onDismissRequest = { onShowMenuChange(false) },
                 ) {
-                    @Suppress("SimplifyBooleanWithConstants", "KotlinConstantConditions")
-                    if (onBlockByKeywords != null && !BuildConfig.IS_LITE) {
-                        DropdownMenuItem(
-                            text = { Text("按关键词屏蔽") },
-                            onClick = {
-                                onShowMenuChange(false)
-                                onBlockByKeywords(item)
-                            },
-                        )
-                    }
-                    DropdownMenuItem(
-                        text = { Text("屏蔽用户") },
-                        onClick = {
-                            onShowMenuChange(false)
-                            onBlockUser?.invoke(item)
-                        },
+                    DropdownMenuContent(
+                        item = item,
+                        onShowMenuChange = onShowMenuChange,
+                        onBlockUser = onBlockUser,
+                        onBlockByKeywords = onBlockByKeywords,
+                        onBlockTopic = onBlockTopic,
+                        navigator = navigator,
                     )
-                    if (onBlockTopic != null && item.raw != null) {
-                        val topics = when (val raw = item.raw) {
-                            is com.github.zly2006.zhihu.data.DataHolder.Answer -> raw.question.topics
-                            is com.github.zly2006.zhihu.data.DataHolder.Question -> raw.topics
-                            is com.github.zly2006.zhihu.data.DataHolder.Article -> raw.topics ?: emptyList()
-                            else -> emptyList()
-                        }
-                        topics.forEach { topic ->
-                            DropdownMenuItem(
-                                text = { Text("屏蔽「${topic.name}」") },
-                                onClick = {
-                                    onShowMenuChange(false)
-                                    onBlockTopic(topic.id, topic.name)
-                                },
-                            )
-                        }
-                    }
-                    DropdownMenuItem(
-                        text = { Text("外观设置") },
-                        onClick = {
-                            onShowMenuChange(false)
-                            navigator.onNavigate(Account.AppearanceSettings())
-                        },
-                    )
-                    if (item.isFiltered) {
-                        DropdownMenuItem(
-                            text = { Text("不再屏蔽低赞内容") },
-                            onClick = {
-                                onShowMenuChange(false)
-                                navigator.onNavigate(Account.RecommendSettings("enableQualityFilter"))
-                            },
-                        )
-                    }
                 }
             }
         }
@@ -677,7 +671,7 @@ private fun FeedCardContent(
             Spacer(modifier = Modifier.height(8.dp))
             AsyncImage(
                 model = thumbnailUrl,
-                contentDescription = "Thumbnail",
+                contentDescription = "缩略图",
                 modifier = Modifier
                     .size(60.dp, 60.dp)
                     .clip(RoundedCornerShape(8.dp)),
@@ -686,34 +680,32 @@ private fun FeedCardContent(
     }
 }
 
-/**
- * 根据 Feed 类型获取标签文本和背景颜色
- */
 private data class TagInfo(
     val text: String,
     val backgroundColor: Color,
+    val textColor: Color = Color.White,
 )
 
 private fun getTagInfo(feed: Feed?, item: FeedDisplayItem): TagInfo {
-    // 首先尝试通过 feed.target 判断
     if (feed != null) {
         val target = feed.target
 
         if (target != null) {
-            // 直接使用 when 表达式检查 target 的实际类型
-            return when (target) {
-                is com.github.zly2006.zhihu.data.Feed.AnswerTarget -> TagInfo("回答", ZhihuBlue)
-                is com.github.zly2006.zhihu.data.Feed.ArticleTarget -> TagInfo("文章", ZhihuGreen)
-                is com.github.zly2006.zhihu.data.Feed.VideoTarget -> TagInfo("视频", ZhihuOrange)
-                is com.github.zly2006.zhihu.data.Feed.PinTarget -> TagInfo("想法", ZhihuRed)
-                is com.github.zly2006.zhihu.data.Feed.QuestionTarget -> TagInfo("问题", ZhihuBlue)
-                else -> TagInfo("其他", NeutralGray500)
+            val typeName = target::class.simpleName ?: ""
+            return when {
+                typeName.contains("Answer") -> TagInfo("回答", ZhihuBlue)
+                typeName.contains("Article") -> TagInfo("文章", ZhihuGreen)
+                typeName.contains("Video") -> TagInfo("视频", ZhihuOrange)
+                typeName.contains("Pin") -> TagInfo("想法", ZhihuRed)
+                typeName.contains("Question") -> TagInfo("问题", ZhihuBlue)
+                else -> {
+                    Log.d("FeedCard", "getTagInfo: unknown target type=$typeName")
+                    TagInfo("其他", NeutralGray500)
+                }
             }
         }
     }
 
-    // 如果 feed 或 target 为 null，使用 item.details 作为后备方案
-    // 支持包含额外信息的 details 文本（如 "回答 · 2小时前"）
     val details = item.details
     return when {
         details.contains("回答") -> TagInfo("回答", ZhihuBlue)

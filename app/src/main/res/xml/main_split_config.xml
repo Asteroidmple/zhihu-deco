@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:window="http://schemas.android.com/apk/res-auto">
+    <!--
+        平行视界分屏配置
+        适配华为/vivo/oppo/荣耀/三星/小米等主流折叠屏设备
+    -->
+
+    <!--
+        SplitPairRule: 定义Activity分屏配对规则
+        - clearTop: 清除顶部Activity，避免堆叠
+        - splitMinWidthDp: 触发分屏的最小屏幕宽度(dp)
+        - splitRatio: 分屏比例(0.0-1.0)，0.5表示左右各占50%
+    -->
+    <SplitPairRule
+        window:clearTop="true"
+        window:splitMinWidthDp="600"
+        window:splitRatio="0.5">
+        <!--
+            MainActivity作为左侧主Activity，右侧可以打开其他Activity
+            主Activity打开任意Activity时触发分屏
+        -->
+        <SplitPairFilter
+            window:primaryActivityName=".MainActivity"
+            window:secondaryActivityName="*" />
+    </SplitPairRule>
+
+    <!--
+        SplitPlaceholderRule: 定义占位Activity规则
+        当屏幕宽度足够但没有右侧内容时显示占位Activity
+    -->
+    <SplitPlaceholderRule
+        window:placeholderActivityName=".PlaceholderActivity"
+        window:splitMinWidthDp="600"
+        window:splitRatio="0.33">
+        <ActivityFilter window:activityName=".PlaceholderActivity" />
+    </SplitPlaceholderRule>
+
+    <!--
+        ActivityRule: 定义特定Activity的规则
+        alwaysExpand="true": 该Activity始终全屏显示，不参与分屏
+    -->
+    <ActivityRule window:alwaysExpand="true">
+        <!-- 登录页面全屏显示 -->
+        <ActivityFilter window:activityName=".LoginActivity" />
+        <!-- 二维码扫描页面全屏显示 -->
+        <ActivityFilter window:activityName=".QRCodeScanActivity" />
+        <!-- 拍照页面全屏显示 -->
+        <ActivityFilter window:activityName=".CaptureActivity" />
+    </ActivityRule>
+</resources>

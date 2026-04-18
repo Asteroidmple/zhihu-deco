@@ -6,7 +6,6 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 
 plugins {
     id("com.android.application")
-    kotlin("android")
     kotlin("plugin.serialization")
     kotlin("plugin.compose")
     id("kotlin-parcelize")
@@ -33,11 +32,11 @@ ksp {
 }
 
 android {
-    namespace = "com.zhihu.deco"
-    compileSdk = 36
+    namespace = "com.github.zly2006.zhihu"
+    compileSdk = 37
 
     defaultConfig {
-        applicationId = "com.zhihu.deco"
+        applicationId = "com.github.zly2006.zhihu"
         minSdk = 27
         targetSdk = 35
         versionCode = property("app.versionCode").toString().toIntOrNull() ?: 1
@@ -84,9 +83,6 @@ android {
             }
         }
     }
-    kotlinOptions {
-        freeCompilerArgs += "-Xdebug"
-    }
     buildTypes {
         val gitHash = gitHash(rootProject.projectDir)
         debug {
@@ -105,9 +101,6 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_24
         targetCompatibility = JavaVersion.VERSION_24
-    }
-    kotlinOptions {
-        jvmTarget = "24"
     }
     buildFeatures {
         viewBinding = true
@@ -148,8 +141,11 @@ android {
     }
 }
 
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    compilerOptions.freeCompilerArgs.add("-Xdebug")
+kotlin {
+    compilerOptions {
+        freeCompilerArgs.add("-Xdebug")
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_24)
+    }
 }
 
 val ktor = "3.4.1"
@@ -173,6 +169,16 @@ dependencies {
     implementation("com.google.android.material:material:1.13.0")
     implementation("com.materialkolor:material-kolor:4.1.1")
 
+    // MIUIX - Xiaomi HyperOS Design Style Components
+    // https://github.com/compose-miuix-ui/miuix
+    val miuixVersion = "0.9.0"
+    implementation("top.yukonga.miuix.kmp:miuix-ui-android:$miuixVersion")
+    implementation("top.yukonga.miuix.kmp:miuix-icons-android:$miuixVersion")
+    implementation("top.yukonga.miuix.kmp:miuix-preference-android:$miuixVersion")
+    implementation("top.yukonga.miuix.kmp:miuix-shapes-android:$miuixVersion")
+    // miuix-blur 需要 minSdk 31，暂不启用
+    // implementation("top.yukonga.miuix.kmp:miuix-blur-android:$miuixVersion")
+
     implementation("org.jsoup:jsoup:1.22.1")
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
 
@@ -181,6 +187,10 @@ dependencies {
 
     implementation("androidx.core:core-ktx:1.17.0")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.10.0")
+
+    // Activity Embedding (平行视界)
+    implementation("androidx.window:window:1.3.0")
+    implementation("androidx.startup:startup-runtime:1.2.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.10.0")
     //noinspection GradleDependency
     implementation("androidx.navigation:navigation-ui-ktx:2.9.2")

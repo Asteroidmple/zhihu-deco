@@ -28,12 +28,15 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -44,6 +47,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -116,6 +120,10 @@ fun AppearanceSettingsScreen(
                     }
                 },
                 windowInsets = WindowInsets(0),
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                ),
             )
         },
     ) { innerPadding ->
@@ -154,22 +162,15 @@ fun AppearanceSettingsScreen(
                         ThemeMode.DARK to "暗色",
                     )
                     themeModes.forEach { (mode, label) ->
-                        OutlinedButton(
+                        FilterChip(
+                            selected = currentThemeMode == mode,
                             onClick = {
                                 ThemeManager.setThemeMode(context, mode)
                                 Toast.makeText(context, "已切换到$label", Toast.LENGTH_SHORT).show()
                             },
-                            colors = ButtonDefaults.outlinedButtonColors(
-                                containerColor = if (currentThemeMode == mode) {
-                                    MaterialTheme.colorScheme.primaryContainer
-                                } else {
-                                    MaterialTheme.colorScheme.surface
-                                },
-                            ),
+                            label = { Text(label) },
                             modifier = Modifier.weight(1f),
-                        ) {
-                            Text(label)
-                        }
+                        )
                     }
                 }
             }
@@ -189,33 +190,20 @@ fun AppearanceSettingsScreen(
 
             AnimatedVisibility(visible = !useDynamicColor) {
                 Column {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { showColorPicker = true }
-                            .padding(horizontal = 16.dp, vertical = 12.dp),
-                    ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                "自定义主题色",
-                                style = MaterialTheme.typography.bodyLarge,
+                    ListItem(
+                        headlineContent = { Text("自定义主题色") },
+                        supportingContent = { Text("点击选择您喜欢的主题颜色") },
+                        trailingContent = {
+                            Box(
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .clip(CircleShape)
+                                    .background(customColor)
+                                    .border(2.dp, MaterialTheme.colorScheme.outline, CircleShape),
                             )
-                            Text(
-                                "点击选择您喜欢的主题颜色",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                        Box(
-                            modifier = Modifier
-                                .size(40.dp)
-                                .clip(CircleShape)
-                                .background(customColor)
-                                .border(2.dp, MaterialTheme.colorScheme.outline, CircleShape),
-                        )
-                    }
+                        },
+                        modifier = Modifier.clickable { showColorPicker = true },
+                    )
                 }
             }
             if (showColorPicker) {

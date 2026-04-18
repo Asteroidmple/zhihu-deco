@@ -30,6 +30,10 @@
             android:theme="@style/Theme.Zhihu"
             android:enableOnBackInvokedCallback="true"
             tools:targetApi="33">
+        <!-- 荣耀设备：优先使用原生Activity Embedding而非EasyGo -->
+        <property
+                android:name="com.hihonor.window.PROPERTY_ACTIVITY_EMBEDDING_SPLITS_FIRST"
+                android:value="true" />
         <activity
                 android:name=".CaptureActivity"
                 android:exported="false"
@@ -80,6 +84,23 @@
                 android:name=".QRCodeScanActivity"
                 android:exported="false"
                 android:theme="@style/Theme.Zhihu"/>
+        <!-- 平行视界占位Activity -->
+        <activity
+                android:name=".PlaceholderActivity"
+                android:exported="false"
+                android:theme="@style/Theme.Zhihu"/>
+
+        <!-- Jetpack Startup初始化Provider -->
+        <provider
+                android:name="androidx.startup.InitializationProvider"
+                android:authorities="${applicationId}.androidx-startup"
+                android:exported="false"
+                android:multiprocess="true"
+                tools:node="merge">
+            <meta-data
+                    android:name="com.github.zly2006.zhihu.SplitWindowInitializer"
+                    android:value="androidx.startup" />
+        </provider>
 
         <provider
                 android:name="androidx.core.content.FileProvider"
@@ -90,6 +111,17 @@
                     android:name="android.support.FILE_PROVIDER_PATHS"
                     android:resource="@xml/file_paths"/>
         </provider>
+
+        <!-- Activity Embedding配置 -->
+        <meta-data
+                android:name="embedded"
+                android:value="true" />
+        <meta-data
+                android:name="android.window.PROPERTY_ACTIVITY_EMBEDDING_SPLITS_ENABLED"
+                android:value="true" />
+        <meta-data
+                android:name="android.window.PROPERTY_ACTIVITY_EMBEDDING_ALLOW_SYSTEM_OVERRIDE"
+                android:value="true" />
     </application>
 
     <queries>

@@ -1,6 +1,5 @@
 package com.github.zly2006.zhihu.ui
 
-import android.content.ClipData
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,7 +20,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Circle
-import androidx.compose.material.icons.filled.CopyAll
 import androidx.compose.material.icons.filled.MarkChatRead
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -52,20 +50,16 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
 import com.github.zly2006.zhihu.Article
 import com.github.zly2006.zhihu.ArticleType
-import com.zhihu.deco.BuildConfig
 import com.github.zly2006.zhihu.LocalNavigator
 import com.github.zly2006.zhihu.Notification
 import com.github.zly2006.zhihu.Person
 import com.github.zly2006.zhihu.Question
 import com.github.zly2006.zhihu.data.NotificationItem
 import com.github.zly2006.zhihu.data.NotificationTarget
-import com.github.zly2006.zhihu.ui.components.DraggableRefreshButton
 import com.github.zly2006.zhihu.ui.components.PaginatedList
 import com.github.zly2006.zhihu.ui.components.ProgressIndicatorFooter
-import com.github.zly2006.zhihu.util.clipboardManager
 import com.github.zly2006.zhihu.viewmodel.NotificationViewModel
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -187,19 +181,6 @@ fun NotificationScreen(
                             }
                         },
                     )
-                }
-            }
-            if (BuildConfig.DEBUG) {
-                DraggableRefreshButton(
-                    onClick = {
-                        val data = Json.encodeToString(viewModel.debugData)
-                        val clip = ClipData.newPlainText("data", data)
-                        context.clipboardManager.setPrimaryClip(clip)
-                        Toast.makeText(context, "已复制调试数据", Toast.LENGTH_SHORT).show()
-                    },
-                    preferenceName = "copyAll",
-                ) {
-                    Icon(Icons.Default.CopyAll, contentDescription = "复制")
                 }
             }
         }

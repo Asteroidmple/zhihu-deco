@@ -7,12 +7,7 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -25,7 +20,6 @@ import com.github.zly2006.zhihu.LocalNavigator
 import com.github.zly2006.zhihu.MainActivity
 import com.github.zly2006.zhihu.data.HotListFeed
 import com.github.zly2006.zhihu.ui.components.BlockUserConfirmDialog
-import com.github.zly2006.zhihu.ui.components.DraggableRefreshButton
 import com.github.zly2006.zhihu.ui.components.FeedCard
 import com.github.zly2006.zhihu.ui.components.FeedPullToRefresh
 import com.github.zly2006.zhihu.ui.components.PaginatedList
@@ -75,21 +69,6 @@ fun HotListScreen(innerPadding: PaddingValues = PaddingValues(0.dp)) {
                         navigator.onNavigate(navDestination)
                     } else {
                         Toast.makeText(context, "暂不支持打开该内容", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
-
-            val showRefreshFab = remember { preferences.getBoolean("showRefreshFab", true) }
-            if (showRefreshFab) {
-                DraggableRefreshButton(
-                    onClick = {
-                        viewModel.refresh(context)
-                    },
-                ) {
-                    if (viewModel.isLoading) {
-                        CircularProgressIndicator(modifier = Modifier.size(36.dp))
-                    } else {
-                        Icon(Icons.Default.Refresh, contentDescription = "刷新")
                     }
                 }
             }

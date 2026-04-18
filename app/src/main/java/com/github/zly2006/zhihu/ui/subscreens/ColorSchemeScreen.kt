@@ -27,7 +27,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.github.zly2006.zhihu.LocalNavigator
-import com.zhihu.deco.R
+import com.github.zly2006.zhihu.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

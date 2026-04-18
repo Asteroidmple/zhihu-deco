@@ -28,7 +28,6 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -58,7 +57,6 @@ import com.github.zly2006.zhihu.LocalNavigator
 import com.github.zly2006.zhihu.MainActivity
 import com.github.zly2006.zhihu.Search
 import com.github.zly2006.zhihu.data.AccountData
-import com.github.zly2006.zhihu.ui.components.DraggableRefreshButton
 import com.github.zly2006.zhihu.ui.components.FeedCard
 import com.github.zly2006.zhihu.ui.components.FeedPullToRefresh
 import com.github.zly2006.zhihu.ui.components.PaginatedList
@@ -322,21 +320,6 @@ fun SearchScreen(
                                 navigator.onNavigate(navDestination)
                             } else {
                                 Toast.makeText(context, "暂不支持打开该内容", Toast.LENGTH_SHORT).show()
-                            }
-                        }
-                    }
-
-                    val showRefreshFab = remember { preferences.getBoolean("showRefreshFab", true) }
-                    if (showRefreshFab) {
-                        DraggableRefreshButton(
-                            onClick = {
-                                viewModel.refresh(context)
-                            },
-                        ) {
-                            if (viewModel.isLoading) {
-                                CircularProgressIndicator(modifier = Modifier.size(36.dp))
-                            } else {
-                                Icon(Icons.Default.Refresh, contentDescription = "刷新")
                             }
                         }
                     }

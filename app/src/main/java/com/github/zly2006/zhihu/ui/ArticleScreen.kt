@@ -66,7 +66,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -75,8 +74,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.TwoRowsTopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -121,7 +120,6 @@ import com.github.zly2006.zhihu.LocalNavigator
 import com.github.zly2006.zhihu.MainActivity
 import com.github.zly2006.zhihu.MainActivity.TtsState
 import com.github.zly2006.zhihu.Question
-import com.zhihu.deco.R
 import com.github.zly2006.zhihu.data.AccountData
 import com.github.zly2006.zhihu.data.Person
 import com.github.zly2006.zhihu.markdown.MarkdownRenderContext
@@ -143,6 +141,7 @@ import com.github.zly2006.zhihu.util.fuckHonorService
 import com.github.zly2006.zhihu.viewmodel.ArticleViewModel
 import com.github.zly2006.zhihu.viewmodel.PaginationViewModel.Paging
 import com.materialkolor.ktx.harmonize
+import com.github.zly2006.zhihu.R
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
@@ -571,7 +570,6 @@ private fun prepareContentDocument(content: String, context: Context): Document 
         }
     }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ArticleScreen(
     article: Article,
@@ -1072,8 +1070,8 @@ fun ArticleScreen(
                                     IconButton(
                                         onClick = { showCollectionDialog = true },
                                         colors = IconButtonDefaults.iconButtonColors(
-                                            containerColor = if (viewModel.isFavorited) Color(0xFFF57C00) else MaterialTheme.colorScheme.secondaryContainer,
-                                            contentColor = if (viewModel.isFavorited) Color.White else MaterialTheme.colorScheme.onSecondaryContainer,
+                                            containerColor = if (viewModel.isFavorited) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.secondaryContainer,
+                                            contentColor = if (viewModel.isFavorited) MaterialTheme.colorScheme.onTertiaryContainer else MaterialTheme.colorScheme.onSecondaryContainer,
                                         ),
                                     ) {
                                         Icon(
@@ -1101,8 +1099,8 @@ fun ArticleScreen(
                                                 )
                                             ),
                                             colors = IconButtonDefaults.iconButtonColors(
-                                                containerColor = Color(0xFF4CAF50),
-                                                contentColor = Color.White,
+                                                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                                             ),
                                         ) {
                                             Icon(
@@ -1326,7 +1324,7 @@ fun ArticleScreen(
                             }
                         },
                 ) {
-                    TwoRowsTopAppBar(
+                    TopAppBar(
                         navigationIcon = {
                             IconButton(onClick = {
                                 val activity = context as? MainActivity
@@ -1351,11 +1349,10 @@ fun ArticleScreen(
                                 }
                             }
                         },
-                        title = { expanded ->
+                        title = {
                             Text(
                                 text = viewModel.title,
                                 modifier = Modifier
-                                    .padding(if (expanded) PaddingValues(end = 16.dp) else PaddingValues())
                                     .let {
                                         if (article.type == ArticleType.Answer) {
                                             it.clickable {
@@ -1365,59 +1362,9 @@ fun ArticleScreen(
                                             it
                                         }
                                     },
-                                maxLines = if (expanded) Int.MAX_VALUE else 1,
+                                maxLines = 2,
                                 overflow = TextOverflow.Ellipsis,
                             )
-                        },
-                        subtitle = { expanded ->
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier
-                                    .padding(if (expanded) PaddingValues(vertical = 16.dp) else PaddingValues(top = 2.dp, bottom = 8.dp))
-                                    .clickable {
-                                        navigator.onNavigate(
-                                            com.github.zly2006.zhihu.Person(
-                                                id = viewModel.authorId,
-                                                urlToken = viewModel.authorUrlToken,
-                                                name = viewModel.authorName,
-                                            ),
-                                        )
-                                    }.padding(end = 16.dp),
-                            ) {
-                                if (viewModel.authorAvatarSrc.isNotEmpty()) {
-                                    AsyncImage(
-                                        model = viewModel.authorAvatarSrc,
-                                        contentDescription = "作者头像",
-                                        modifier = Modifier
-                                            .size(if (expanded) 40.dp else 20.dp)
-                                            .clip(CircleShape),
-                                    )
-                                } else {
-                                    Box(
-                                        modifier = Modifier
-                                            .size(if (expanded) 40.dp else 20.dp)
-                                            .clip(CircleShape)
-                                            .background(MaterialTheme.colorScheme.surfaceVariant),
-                                    )
-                                }
-
-                                Spacer(modifier = Modifier.width(if (expanded) 8.dp else 4.dp))
-
-                                Column {
-                                    Text(
-                                        text = viewModel.authorName,
-                                        style = if (expanded) MaterialTheme.typography.titleSmall else MaterialTheme.typography.labelMedium,
-                                        color = if (expanded) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
-                                    )
-                                    if (viewModel.authorBio.isNotEmpty() && expanded) {
-                                        Text(
-                                            text = viewModel.authorBio,
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        )
-                                    }
-                                }
-                            }
                         },
                         scrollBehavior = if (scrollStateMaxValue > 0) scrollBehavior else null,
                     )
@@ -1511,8 +1458,8 @@ fun ArticleScreen(
                                 IconButton(
                                     onClick = { showCollectionDialog = true },
                                     colors = IconButtonDefaults.iconButtonColors(
-                                        containerColor = if (viewModel.isFavorited) Color(0xFFF57C00) else MaterialTheme.colorScheme.secondaryContainer,
-                                        contentColor = if (viewModel.isFavorited) Color.White else MaterialTheme.colorScheme.onSecondaryContainer,
+                                        containerColor = if (viewModel.isFavorited) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.secondaryContainer,
+                                        contentColor = if (viewModel.isFavorited) MaterialTheme.colorScheme.onTertiaryContainer else MaterialTheme.colorScheme.onSecondaryContainer,
                                     ),
                                 ) {
                                     Icon(if (viewModel.isFavorited) Icons.Filled.Bookmark else Icons.Filled.BookmarkBorder, contentDescription = "收藏")
@@ -1663,12 +1610,12 @@ fun ArticleScreen(
                                     onClick = { showCollectionDialog = true },
                                     colors = IconButtonDefaults.iconButtonColors(
                                         containerColor = if (viewModel.isFavorited) {
-                                            Color(0xFFF57C00).harmonize(MaterialTheme.colorScheme.primary)
+                                            MaterialTheme.colorScheme.tertiaryContainer
                                         } else {
                                             MaterialTheme.colorScheme.surfaceContainer
                                         },
                                         contentColor = if (viewModel.isFavorited) {
-                                            Color.White.copy(alpha = 0.87f)
+                                            MaterialTheme.colorScheme.onTertiaryContainer
                                         } else {
                                             MaterialTheme.colorScheme.onSurface
                                         },
@@ -1690,8 +1637,8 @@ fun ArticleScreen(
                                         },
                                         enabled = ttsState !in listOf(TtsState.Error, TtsState.Uninitialized, TtsState.Initializing, null),
                                         colors = IconButtonDefaults.iconButtonColors(
-                                            containerColor = Color(0xFF4CAF50).harmonize(MaterialTheme.colorScheme.primary),
-                                            contentColor = Color.White,
+                                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                                         ),
                                     ) {
                                         Icon(Icons.AutoMirrored.Filled.VolumeOff, contentDescription = "停止朗读")
@@ -2041,14 +1988,14 @@ private fun CachedAnswerPreview(
                     Row(
                         modifier = Modifier
                             .clip(RoundedCornerShape(50))
-                            .background(color = Color(0xFF40B6F6)),
+                            .background(color = MaterialTheme.colorScheme.primaryContainer),
                         horizontalArrangement = Arrangement.Start,
                     ) {
                         Button(
                             onClick = {},
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFF40B6F6),
-                                contentColor = Color.Black,
+                                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                             ),
                             shape = RectangleShape,
                             contentPadding = PaddingValues(horizontal = 0.dp),

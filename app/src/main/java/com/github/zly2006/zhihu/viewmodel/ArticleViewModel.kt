@@ -823,6 +823,7 @@ class ArticleViewModel(
                             // 确保 WebView 测量出足以容纳所有内容的尺寸
                             val contentWidth = webView.measuredWidth // 使用当前的宽度（通常是屏幕宽度）
                             // 获取整个网页内容的实际高度（很重要）
+                            @Suppress("DEPRECATION")
                             val contentHeight = (webView.contentHeight * webView.scale).toInt()
 
                             if (contentWidth > 0 && contentHeight > 0) {
@@ -1080,6 +1081,7 @@ class ArticleViewModel(
     private suspend fun captureWebViewToImage(webView: WebView, context: Context, onComplete: (Boolean) -> Unit, suffix: String = "") {
         try {
             // 获取WebView的实际内容高度
+            @Suppress("DEPRECATION")
             val contentHeight = (webView.contentHeight * webView.scale).toInt()
             val width = webView.width
             val height = if (contentHeight > 0) contentHeight else 1920 // 默认高度
