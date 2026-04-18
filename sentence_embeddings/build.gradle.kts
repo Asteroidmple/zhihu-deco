@@ -33,12 +33,12 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_24
+        targetCompatibility = JavaVersion.VERSION_24
     }
     kotlinOptions { 
         @Suppress("DEPRECATION")
-        jvmTarget = "11" 
+        jvmTarget = "24"
     }
 
     androidResources {
