@@ -1,6 +1,0 @@
-<resources>
-    <style name="Theme.Zhihu" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="android:windowSplashScreenBackground">#1E293B</item>
-        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
-    </style>
-</resources>

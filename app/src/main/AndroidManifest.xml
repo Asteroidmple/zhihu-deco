@@ -30,10 +30,20 @@
             android:theme="@style/Theme.Zhihu"
             android:enableOnBackInvokedCallback="true"
             tools:targetApi="33">
+<<<<<<< HEAD
         <!-- 荣耀设备：优先使用原生Activity Embedding而非EasyGo -->
         <property
                 android:name="com.hihonor.window.PROPERTY_ACTIVITY_EMBEDDING_SPLITS_FIRST"
                 android:value="true" />
+=======
+        <meta-data
+                android:name="com.github.zly2006.zhihu.BUILD_TYPE"
+                android:value="${zhihuBuildType}"/>
+        <meta-data
+                android:name="com.github.zly2006.zhihu.GIT_HASH"
+                android:value="${zhihuGitHash}"/>
+
+>>>>>>> afb58205039fb418bd264b83544cc9e612ab9299
         <activity
                 android:name=".CaptureActivity"
                 android:exported="false"
@@ -80,6 +90,11 @@
         <activity
                 android:name=".WebviewActivity"
                 android:exported="false"/>
+        <activity
+                android:name=".VideoPlayerActivity"
+                android:exported="false"
+                android:theme="@style/Theme.Zhihu"
+                android:configChanges="orientation|screenSize"/>
         <activity
                 android:name=".QRCodeScanActivity"
                 android:exported="false"

@@ -101,6 +101,7 @@ desktop.ini
 *.swo
 *~
 .tmp/
+<<<<<<< HEAD
 
 # ============================================================================
 # Python 缓存 - Python Cache
@@ -154,3 +155,23 @@ local_changes.patch
 # 其他 IDE/工具
 .claude/
 .omx/
+=======
+.memory/*
+!.memory/.gitkeep
+__pycache__/
+
+# Oh my codex
+.omx/
+
+.worktrees
+
+# Local secrets
+.secret/
+.log/
+.codex/autoreview-state.json
+.codex/hooks/__pycache__/
+
+# IntelliJ generated apks
+app/lite
+app/full
+>>>>>>> afb58205039fb418bd264b83544cc9e612ab9299

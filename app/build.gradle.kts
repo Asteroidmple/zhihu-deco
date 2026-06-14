@@ -1,11 +1,18 @@
 @file:OptIn(ExperimentalEncodingApi::class)
 
 import buildlogic.gitHash
+import org.gradle.api.tasks.testing.Test
+import org.gradle.jvm.toolchain.JavaLanguageVersion
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
 plugins {
     id("com.android.application")
+<<<<<<< HEAD
+=======
+    id("com.mikepenz.aboutlibraries.plugin.android")
+    kotlin("android")
+>>>>>>> afb58205039fb418bd264b83544cc9e612ab9299
     kotlin("plugin.serialization")
     kotlin("plugin.compose")
     id("kotlin-parcelize")
@@ -42,7 +49,7 @@ android {
         versionCode = property("app.versionCode").toString().toIntOrNull() ?: 1
         versionName = property("app.versionName").toString()
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.github.zly2006.zhihu.ZhihuInstrumentedTestRunner"
     }
 
     flavorDimensions += "version"
@@ -64,6 +71,8 @@ android {
         localeFilters += listOf("en", "zh")
     }
 
+    sourceSets.getByName("androidTest").assets.srcDir(layout.buildDirectory.dir("generated/androidTestSecrets"))
+
     testOptions {
         unitTests {
             isReturnDefaultValues = true
@@ -83,24 +92,40 @@ android {
             }
         }
     }
+<<<<<<< HEAD
+=======
+
+>>>>>>> afb58205039fb418bd264b83544cc9e612ab9299
     buildTypes {
         val gitHash = gitHash(rootProject.projectDir)
         debug {
             buildConfigField("String", "GIT_HASH", "\"$gitHash\"")
+            manifestPlaceholders["zhihuBuildType"] = "debug"
+            manifestPlaceholders["zhihuGitHash"] = gitHash
         }
         release {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             buildConfigField("String", "GIT_HASH", "\"$gitHash\"")
+            manifestPlaceholders["zhihuBuildType"] = "release"
+            manifestPlaceholders["zhihuGitHash"] = gitHash
             if (System.getenv("signingKey") != null) {
                 signingConfig = signingConfigs["env"]
             }
         }
     }
     compileOptions {
+<<<<<<< HEAD
         sourceCompatibility = JavaVersion.VERSION_24
         targetCompatibility = JavaVersion.VERSION_24
+=======
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    kotlin {
+        jvmToolchain(17)
+>>>>>>> afb58205039fb418bd264b83544cc9e612ab9299
     }
     buildFeatures {
         viewBinding = true
@@ -141,18 +166,71 @@ android {
     }
 }
 
+<<<<<<< HEAD
 kotlin {
     compilerOptions {
         freeCompilerArgs.add("-Xdebug")
         jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_24)
     }
+=======
+val generatedAndroidTestSecretsDir = layout.buildDirectory.dir("generated/androidTestSecrets")
+
+val prepareAndroidTestSecretAccount by tasks.registering {
+    val secretAccountFile = rootProject.file(".secret/account.json")
+    outputs.dir(generatedAndroidTestSecretsDir)
+    doLast {
+        val outputDir = generatedAndroidTestSecretsDir.get().asFile
+        delete(outputDir)
+        if (secretAccountFile.exists()) {
+            copy {
+                from(secretAccountFile)
+                into(outputDir.resolve("secret"))
+                rename { "account.json" }
+            }
+        }
+    }
 }
 
-val ktor = "3.4.1"
+tasks
+    .matching {
+        it.name.startsWith("merge") && it.name.contains("AndroidTestAssets")
+    }.configureEach {
+        dependsOn(prepareAndroidTestSecretAccount)
+    }
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+    compilerOptions.freeCompilerArgs.add("-Xdebug")
+>>>>>>> afb58205039fb418bd264b83544cc9e612ab9299
+}
+
+tasks.withType<Test>().configureEach {
+    javaLauncher.set(
+        javaToolchains.launcherFor {
+            languageVersion.set(JavaLanguageVersion.of(21))
+        },
+    )
+}
+
+val ktor = "3.5.0"
 val coil = "3.4.0"
+val aboutLibraries = "14.0.1"
+val composeVersion = "1.11.0"
+val lifecycleVersion = "2.10.0"
+
+// Force material3 to 1.10.0-alpha05，与 shared 模块保持一致。
+// 根因：shared 模块 commonMain 通过 material-kolor 的 strictly 约束解析到 1.10.0-alpha05，
+// 但平台配置和本模块如果没有 force，会各自解析到不同版本（1.9.0 或 1.11.0-alpha07），
+// 导致运行时类冲突或编译时 internal API 不可见。
+configurations.configureEach {
+    resolutionStrategy {
+        force("org.jetbrains.compose.material3:material3:1.10.0-alpha05")
+    }
+}
+
 dependencies {
+    implementation(project(":shared"))
     implementation("androidx.preference:preference:1.2.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0")
     implementation("io.ktor:ktor-client-core-jvm:$ktor")
     implementation("io.ktor:ktor-client-android:$ktor")
     implementation("io.ktor:ktor-client-content-negotiation-jvm:$ktor")
@@ -161,12 +239,16 @@ dependencies {
     //noinspection GradleDependency
     implementation("androidx.browser:browser:1.8.0")
 
+    implementation("io.github.zly2006:markdown-parser-android:0.0.1-alpha.11")
+    implementation("io.github.zly2006:markdown-renderer-android:0.0.1-alpha.11")
+    implementation("io.github.zly2006:latex-renderer-android:1.4.6-zly")
+
     implementation("io.coil-kt.coil3:coil-compose:$coil")
     implementation("io.coil-kt.coil3:coil-network-ktor3-android:$coil")
     implementation("io.coil-kt.coil3:coil-gif:$coil")
-    implementation("io.coil-kt.coil3:coil-svg:$coil")
+    // implementation("io.coil-kt.coil3:coil-svg:$coil")
+    implementation("me.saket.telephoto:zoomable-image-coil3:0.19.0")
 
-    implementation("com.google.android.material:material:1.13.0")
     implementation("com.materialkolor:material-kolor:4.1.1")
 
     // MIUIX - Xiaomi HyperOS Design Style Components
@@ -180,11 +262,11 @@ dependencies {
     // implementation("top.yukonga.miuix.kmp:miuix-blur-android:$miuixVersion")
 
     implementation("org.jsoup:jsoup:1.22.1")
-    implementation("androidx.legacy:legacy-support-v4:1.0.0")
 
     // ZXing for QR code scanning
     implementation("com.journeyapps:zxing-android-embedded:4.3.0")
 
+<<<<<<< HEAD
     implementation("androidx.core:core-ktx:1.17.0")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.10.0")
 
@@ -192,41 +274,44 @@ dependencies {
     implementation("androidx.window:window:1.3.0")
     implementation("androidx.startup:startup-runtime:1.2.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.10.0")
+=======
+    implementation("androidx.core:core-ktx:1.18.0")
+    // Lifecycle (JetBrains KMP versions)
+    implementation("org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose:$lifecycleVersion")
+    implementation("org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycleVersion")
+    // LiveData is Android-specific, keep androidx
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
+    // Navigation (JetBrains KMP version)
+>>>>>>> afb58205039fb418bd264b83544cc9e612ab9299
     //noinspection GradleDependency
-    implementation("androidx.navigation:navigation-ui-ktx:2.9.2")
-    implementation("androidx.webkit:webkit:1.14.0")
-    implementation("androidx.activity:activity-compose:1.12.1")
-    implementation(platform("androidx.compose:compose-bom:2025.12.00"))
-    implementation("androidx.compose.ui:ui")
-    implementation("androidx.compose.ui:ui-graphics")
+    implementation("org.jetbrains.androidx.navigation:navigation-compose:2.9.2")
+
+    implementation("androidx.webkit:webkit:1.16.0")
+    implementation("androidx.activity:activity-compose:1.13.0")
+    // Compose (core from JetBrains KMP)
+    implementation("org.jetbrains.compose.runtime:runtime:$composeVersion")
+    implementation("org.jetbrains.compose.foundation:foundation:$composeVersion")
+    implementation("org.jetbrains.compose.material3:material3:1.10.0-alpha05")
+    implementation("org.jetbrains.compose.ui:ui:$composeVersion")
+    implementation("org.jetbrains.compose.ui:ui-graphics:$composeVersion")
+    implementation("org.jetbrains.compose.animation:animation:$composeVersion")
+    implementation("org.jetbrains.compose.animation:animation-core:$composeVersion")
+    implementation("org.jetbrains.compose.components:components-resources-android:$composeVersion")
+    // Compose (AndroidX — icons, tooling, test not available from JetBrains yet)
+    implementation(platform("androidx.compose:compose-bom:2026.05.00"))
     implementation("androidx.compose.material:material-icons-extended")
-    //noinspection GradleDependency
-    implementation("androidx.navigation:navigation-compose:2.9.2")
-    //noinspection GradleDependency
-    implementation("androidx.compose.animation:animation:1.8.2")
-    //noinspection GradleDependency
-    implementation("androidx.compose.animation:animation-core:1.8.2")
-    implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.ui:ui-tooling-preview")
+    implementation("com.mikepenz:aboutlibraries-compose-m3:$aboutLibraries")
     implementation("androidx.room:room-common-jvm:2.8.4")
     implementation("androidx.room:room-runtime-android:2.8.4")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.10.0")
-    annotationProcessor("androidx.room:room-compiler:2.8.4")
-    ksp("androidx.room:room-compiler:2.8.4")
     "fullImplementation"(project(":sentence_embeddings"))
     debugImplementation("androidx.compose.ui:ui-tooling")
-    debugImplementation("androidx.compose.ui:ui-tooling-preview")
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
-
-    implementation("com.github.chrisbanes:PhotoView:2.0.0") {
-        exclude(group = "com.android.support")
-    }
+    androidTestImplementation(platform("androidx.compose:compose-bom:2026.05.00"))
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
 
     // HanLP for Chinese NLP
     "fullImplementation"("com.hankcs:hanlp:portable-1.8.4")
-//    implementation("com.halilibo.compose-richtext:richtext-ui-material3-android:1.0.0-alpha03")
-//    implementation("com.halilibo.compose-richtext:richtext-markdown-android:1.0.0-alpha03")
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("io.ktor:ktor-client-cio:$ktor")
@@ -235,4 +320,5 @@ dependencies {
     //noinspection GradleDependency
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.7.0")
+    androidTestImplementation("io.ktor:ktor-client-mock:$ktor")
 }

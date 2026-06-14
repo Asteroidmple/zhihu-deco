@@ -1,3 +1,20 @@
+/*
+ * Zhihu++ - Free & Ad-Free Zhihu client for Android.
+ * Copyright (C) 2024-2026, zly2006 <i@zly2006.me>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation (version 3 only).
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.github.zly2006.zhihu
 
 import android.annotation.SuppressLint
@@ -17,6 +34,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.net.toUri
 import androidx.webkit.WebViewClientCompat
 import com.github.zly2006.zhihu.data.AccountData
+import com.github.zly2006.zhihu.navigation.resolveContent
 import com.github.zly2006.zhihu.ui.components.setupUpWebviewClient
 import com.github.zly2006.zhihu.util.enableEdgeToEdgeCompat
 import com.github.zly2006.zhihu.util.luoTianYiUrlLauncher
@@ -64,7 +82,7 @@ class WebviewActivity : ComponentActivity() {
                                         return true
                                     }
                                 } else if (request.url.host == "www.zhihu.com" || request.url.host == "zhuanlan.zhihu.com" || request.url.scheme == "zhihu") {
-                                    val destination = resolveContent(request.url)
+                                    val destination = resolveContent(request.url.toString())
                                     if (destination != null) {
                                         val intent = Intent(this@WebviewActivity, MainActivity::class.java).apply {
                                             action = Intent.ACTION_VIEW

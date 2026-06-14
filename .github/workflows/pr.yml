@@ -34,7 +34,6 @@ jobs:
             ~/.m2/repository
             ./.gradle
             ./**/.gradle
-            ./apk-recompress/target
           # dont invalidate cache if only gradle.properties is changed -- they
           key: gradle-cache-${{ hashFiles('**/*.gradle.kts', '**/gradle-wrapper.properties') }}
       - name: Setup rust
@@ -74,3 +73,9 @@ jobs:
         with:
           name: PR Debug artifacts
           path: app/build/upload/
+      - name: Upload test reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: PR Test Reports
+          path: app/build/reports

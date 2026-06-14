@@ -1,6 +1,10 @@
 # Zhihu-deco（知乎·简悦）：注重隐私、互联网个人权利和无广告的知乎客户端
 
+<<<<<<< HEAD
 本项目还不够完善，欢迎 PR。
+=======
+[![GitHub release](https://img.shields.io/github/v/release/zly2006/zhihu-plus-plus)](https://github.com/zly2006/zhihu-plus-plus/releases)
+>>>>>>> afb58205039fb418bd264b83544cc9e612ab9299
 
 Zhihu-deco 独创本地推荐算法，把内容推荐完全放在本地进行，为您提供和筛选高质量内容。
 本地推荐算法完全独立于知乎算法，依赖爬虫运行，可以自由定制各种推荐权重，保证看到自己想看的内容。
@@ -12,6 +16,12 @@ Zhihu-deco 独创本地推荐算法，把内容推荐完全放在本地进行，
 
 可以设置屏蔽词、AI 屏蔽回答、屏蔽用户、屏蔽话题等。
 
+## 应用截图
+
+| 首页 | 关注 | 日报 | 个人主页 | 文章 |
+| --- | --- | --- | --- | --- |
+| ![首页截图](fastlane/metadata/android/zh-CN/images/phoneScreenshots/1_home.jpg) | ![关注截图](fastlane/metadata/android/zh-CN/images/phoneScreenshots/2_follow.jpg) | ![日报截图](fastlane/metadata/android/zh-CN/images/phoneScreenshots/3_daily.jpg) | ![个人主页截图](fastlane/metadata/android/zh-CN/images/phoneScreenshots/4_people.jpg) | ![文章截图](fastlane/metadata/android/zh-CN/images/phoneScreenshots/5_article.jpg) |
+
 ## 下载
 
 告别知乎 110MB+ 的客户端，只要不到 4 MB！
@@ -20,22 +30,23 @@ Zhihu-deco 独创本地推荐算法，把内容推荐完全放在本地进行，
 
 [下载最新开发版本](https://github.com/Asteroidmple/zhihu-deco/releases/tag/nightly)
 
-## 捐赠
-
-[爱发电支持作者](https://afdian.com/a/zly2006)
+> 关于Full和Lite两个版本的说明：
+> Full版本包含了一个onnx框架，可以在端侧进行离线AI推理，支持基于LLM embedding的智能内容过滤功能，
+> 这实际上主要是本人对端侧AI的技术尝试，实际功能还有很多没开发的，比如人本地知识库（懒）；
+> Lite版本不支持智能内容过滤，但体积更小，性能更好。您可以根据自己的需求选择下载哪个版本。
 
 ## 路线图
 
 ### 已经实现的功能
 
-- 登录
+- 登录与账号
   - 支持手机验证码登录
   - 支持通过扫码在电脑端登录
-  - 支持手动设置cookie登录
-- 首页推荐
-  - 支持 Web 端推荐算法
-  - 支持安卓端推荐算法
+  - 支持手动设置 Cookie 登录
+- 信息流与推荐
+  - 首页推荐支持 Web / 安卓 / 本地 / 混合模式
   - 支持切换 **登录状态 / 非登录状态** 下的推荐，防止信息茧房
+<<<<<<< HEAD
 - 阅读回答
 - 阅读文章
 - 朗读内容
@@ -60,12 +71,59 @@ Zhihu-deco 独创本地推荐算法，把内容推荐完全放在本地进行，
 - 热榜
 - 搜索
 - 用户主页（查看回答、文章、想法、关注者等）
+=======
+  - 支持关注页（推荐/动态）、热榜、知乎日报、搜索（含热搜）
+  - 支持智能内容过滤、质量过滤、反向屏蔽、过滤统计与屏蔽记录
+  - **支持屏蔽知乎盐选付费内容**
+- 内容浏览
+  - 阅读回答
+  - 阅读文章
+  - 浏览问题详情页（排序、关注、日志、分享、评论）
+  - 浏览想法（Pin）详情页（点赞、评论、分享、话题）
+  - 浏览收藏夹及收藏夹内容
+  - 历史记录（在线历史 + 本地历史，支持删除）
+  - 展示知乎官方认证徽章
+- 阅读
+  - 朗读内容（听文章 / 听回答）
+  - 回答页长按保存图片 **无水印**
+  - 回答切换手势（上下/左右切换）与”下一个回答”按钮
+  - AI 总结内容
+  - **导出内容**（PDF / 图片 / Markdown / HTML）
+  - **支持导出整个收藏夹**
+  - 内容划线高亮
+  - 图片查看器支持动图（GIF）
+  - 数学公式渲染（LaTeX，字体动态下载）
+  - 可拖动滚动条、上划/下划自动隐藏/显示操作按钮
+- 社区互动
+  - 支持查看个人主页（含关注订阅板块）、关注/拉黑用户、屏蔽推荐
+  - 评论区（含子评论、回复、点赞、按时间排序）
+  - 通知（支持全部标记已读、自动标记已读与通知筛选）
+  - 表情包
+    - 经典表情`[惊喜]` <img src="misc/emojis/emoji_1114211280118018048.png" height="18" style="diSplay:inline"> 强势回归！
+- 屏蔽系统
+  - 屏蔽词（支持正则表达式）
+  - NLP 屏蔽词（基于 LLM embedding 和向量相似度匹配，仅 full 版本可用）
+  - 屏蔽用户
+  - 屏蔽话题
+  - **导出屏蔽词** & **导入屏蔽词**（支持跨设备迁移）
+  - 屏蔽历史记录
+>>>>>>> afb58205039fb418bd264b83544cc9e612ab9299
 - 其他
-  - 支持 zse96 v2 签名算法（可以调用99%的网页端API）
+  - 支持 zse96 v2 签名算法（可以调用 99% 的网页端 API）
   - 支持模拟安卓端 API 调用
+<<<<<<< HEAD
   - 自动刷新登录凭证
 - 其他（非知乎）
   - 提供了二维码扫码结果展示和复制功能，可用于提取网址、Wi-Fi密码等信息
+=======
+  - 支持 Deep Link 与剪贴板链接识别跳转
+  - 支持二维码扫码结果展示和复制，可用于提取网址、Wi-Fi 密码等信息
+  - 主界面支持横滑切换标签页
+  - 防沉迷提醒
+  - 支持自定义初始页面
+  - 双击操作快速 **点赞** 或 **打开评论区**
+  - 点击底部导航栏回到顶部/刷新
+>>>>>>> afb58205039fb418bd264b83544cc9e612ab9299
 
 ### 尚未实现的功能（帮助欢迎 PR）
 
@@ -149,6 +207,7 @@ Zhihu-deco 独创本地推荐算法，把内容推荐完全放在本地进行，
 - [Hydrogen](https://github.com/zhihulite/Hydrogen)
 - [Zhihu--](https://github.com/huamurui/zhihu-minus-minus) （极早期开发阶段，功能尚有欠缺）
 
+<<<<<<< HEAD
 ### 开发贡献指南
 
 详见 [CLAUDE.md](./CLAUDE.md)，包含：
@@ -157,3 +216,20 @@ Zhihu-deco 独创本地推荐算法，把内容推荐完全放在本地进行，
 - Android 调试标准流程
 - Code Review 要求
 - 最新代码审查报告
+=======
+## 贡献者
+
+感谢所有为 Zhihu++ 做出贡献的开发者与用户，正是你们让这个项目持续变得更好。
+
+[![Contributors](https://ghcontrib.pages.dev/image?repo=zly2006/zhihu-plus-plus)](https://github.com/zly2006/zhihu-plus-plus/graphs/contributors)
+
+<details>
+<summary>碎碎念</summary>
+
+转眼之间，这个项目也做了快两年了，高频更新也进行了一年了，我想给自己放个假。
+
+我想有的开源作者进行internet break确实是有必要的。网络神人太多。有人没学小学语文不会写标题的，有人觉得他果爹放个屁都是香的，还有人觉得我是超人什么都能做，生产力吊打别人一个公司的。
+
+我确实是累了，我已经unsubscribe了issue和PR，subscribe确实会带来过大的心理压力，这些垃圾会直接冲进你的邮箱。
+</details>
+>>>>>>> afb58205039fb418bd264b83544cc9e612ab9299

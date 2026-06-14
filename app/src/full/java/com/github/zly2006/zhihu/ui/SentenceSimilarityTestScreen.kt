@@ -1,12 +1,27 @@
+/*
+ * Zhihu++ - Free & Ad-Free Zhihu client for Android.
+ * Copyright (C) 2024-2026, zly2006 <i@zly2006.me>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation (version 3 only).
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.github.zly2006.zhihu.ui
 
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -42,7 +57,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.github.zly2006.zhihu.LocalNavigator
+import com.github.zly2006.zhihu.navigation.LocalNavigator
 import com.github.zly2006.zhihu.nlp.ModelState
 import com.github.zly2006.zhihu.nlp.SentenceEmbeddingManager
 import kotlinx.coroutines.Dispatchers
@@ -53,9 +68,7 @@ import kotlin.math.sqrt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SentenceSimilarityTestScreen(
-    innerPadding: PaddingValues,
-) {
+fun SentenceSimilarityTestScreen() {
     val navigator = LocalNavigator.current
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -93,14 +106,8 @@ fun SentenceSimilarityTestScreen(
         }
     }
 
-    fun unloadModel() {
-        coroutineScope.launch {
-            SentenceEmbeddingManager.unload()
-        }
-    }
-
     Scaffold(
-        modifier = Modifier.padding(innerPadding),
+        modifier = Modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
                 title = {
@@ -165,7 +172,6 @@ fun SentenceSimilarityTestScreen(
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surface,
                 ),
-                windowInsets = WindowInsets(0.dp),
             )
         },
     ) { paddingValues ->
@@ -213,7 +219,11 @@ fun SentenceSimilarityTestScreen(
                         Text(if (isModelLoading) "加载中..." else "加载模型")
                     }
                     TextButton(
-                        onClick = { unloadModel() },
+                        onClick = {
+                            coroutineScope.launch {
+                                SentenceEmbeddingManager.unload()
+                            }
+                        },
                         enabled = isModelReady && !isComputing,
                     ) {
                         Text("卸载模型")

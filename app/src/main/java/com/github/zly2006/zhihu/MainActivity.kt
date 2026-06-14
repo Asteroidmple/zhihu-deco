@@ -1,3 +1,20 @@
+/*
+ * Zhihu++ - Free & Ad-Free Zhihu client for Android.
+ * Copyright (C) 2024-2026, zly2006 <i@zly2006.me>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation (version 3 only).
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.github.zly2006.zhihu
 
 import android.annotation.SuppressLint
@@ -8,19 +25,19 @@ import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.compose.foundation.layout.Box
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
-import androidx.core.content.edit
-import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -33,21 +50,55 @@ import coil3.memory.MemoryCache
 import coil3.request.crossfade
 import com.github.zly2006.zhihu.data.AccountData
 import com.github.zly2006.zhihu.data.HistoryStorage
+import com.github.zly2006.zhihu.navigation.Article
+import com.github.zly2006.zhihu.navigation.ArticleType
+import com.github.zly2006.zhihu.navigation.CollectionContent
+import com.github.zly2006.zhihu.navigation.History
+import com.github.zly2006.zhihu.navigation.Home
+import com.github.zly2006.zhihu.navigation.MainTabs
+import com.github.zly2006.zhihu.navigation.NavDestination
+import com.github.zly2006.zhihu.navigation.Notification
+import com.github.zly2006.zhihu.navigation.Pin
+import com.github.zly2006.zhihu.navigation.Question
+import com.github.zly2006.zhihu.navigation.TopLevelDestination
+import com.github.zly2006.zhihu.navigation.Video
+import com.github.zly2006.zhihu.navigation.resolveContent
+import com.github.zly2006.zhihu.nlp.NLPService
+import com.github.zly2006.zhihu.nlp.NlpServiceKeywordSemanticMatcher
 import com.github.zly2006.zhihu.nlp.SentenceEmbeddingManager
-import com.github.zly2006.zhihu.theme.ThemeManager
+import com.github.zly2006.zhihu.shared.filter.ContentOpenEventSupport
+import com.github.zly2006.zhihu.shared.filter.ContentOpenFrom
+import com.github.zly2006.zhihu.shared.filter.TrackedContentIdentity
+import com.github.zly2006.zhihu.shared.nlp.KeywordWeightExtractor
+import com.github.zly2006.zhihu.shared.platform.androidSettingsStore
+import com.github.zly2006.zhihu.shared.platform.androidUserMessageSink
+import com.github.zly2006.zhihu.shared.util.ZHIHU_WEB_ZSE93
+import com.github.zly2006.zhihu.theme.AndroidThemeSettings
 import com.github.zly2006.zhihu.theme.ZhihuTheme
-import com.github.zly2006.zhihu.ui.PREFERENCE_NAME
-import com.github.zly2006.zhihu.ui.ZhihuMain
+import com.github.zly2006.zhihu.ui.AndroidZhihuMain
+import com.github.zly2006.zhihu.ui.ArticleAnswerSwitchState
+import com.github.zly2006.zhihu.ui.ArticleHost
+import com.github.zly2006.zhihu.ui.TtsState
 import com.github.zly2006.zhihu.ui.components.getHighestQualityVideoUrl
+<<<<<<< HEAD
+=======
+import com.github.zly2006.zhihu.ui.subscreens.DeveloperRuntimeInfo
+import com.github.zly2006.zhihu.ui.subscreens.DeveloperRuntimeInfoProvider
+import com.github.zly2006.zhihu.updater.UpdateManager
+import com.github.zly2006.zhihu.util.ContinuousUsageReminderManager
+>>>>>>> afb58205039fb418bd264b83544cc9e612ab9299
 import com.github.zly2006.zhihu.util.EmojiManager
 import com.github.zly2006.zhihu.util.PowerSaveModeCompat
 import com.github.zly2006.zhihu.util.ZhihuCredentialRefresher
 import com.github.zly2006.zhihu.util.clearShareImageCache
 import com.github.zly2006.zhihu.util.clipboardManager
 import com.github.zly2006.zhihu.util.enableEdgeToEdgeCompat
-import com.github.zly2006.zhihu.util.luoTianYiUrlLauncher
 import com.github.zly2006.zhihu.util.telemetry
-import com.github.zly2006.zhihu.viewmodel.filter.ContentFilterExtensions
+import com.github.zly2006.zhihu.viewmodel.AndroidArticlesSharedData
+import com.github.zly2006.zhihu.viewmodel.filter.AndroidContentFilterRuntime
+import com.github.zly2006.zhihu.viewmodel.filter.contentFilterSettings
+import com.github.zly2006.zhihu.viewmodel.filter.getContentFilterDatabase
+import com.github.zly2006.zhihu.viewmodel.filter.performContentFilterMaintenanceCleanup
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -58,12 +109,26 @@ import kotlinx.coroutines.withContext
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
-class MainActivity : ComponentActivity() {
+class MainActivity :
+    ComponentActivity(),
+    ArticleHost,
+    DeveloperRuntimeInfoProvider {
     class SharedData : ViewModel() {
         var clipboardDestination: NavDestination? = null
     }
 
     val sharedData by viewModels<SharedData>()
+    override val articleNavController: NavHostController
+        get() = navController
+    override val articleAnswerSwitchState: ArticleAnswerSwitchState
+        get() = ViewModelProvider(this)[AndroidArticlesSharedData::class.java]
+    override val articleTtsState: TtsState
+        get() = ttsState
+    override var clipboardDestination: NavDestination?
+        get() = sharedData.clipboardDestination
+        set(value) {
+            sharedData.clipboardDestination = value
+        }
     lateinit var history: HistoryStorage
     val httpClient by lazy {
         AccountData.httpClient(this)
@@ -77,20 +142,6 @@ class MainActivity : ComponentActivity() {
         Pico,
         Google,
         Sherpa,
-    }
-
-    @Suppress("unused")
-    enum class TtsState(
-        val isSpeaking: Boolean = false,
-    ) {
-        Uninitialized, // 未初始化
-        Initializing, // 初始化中
-        Ready, // 已初始化
-        Error, // 失败，需要重新初始化
-        LoadingText, // 正在加载文本
-        Speaking(true), // 正在朗读
-        Paused, // 暂停朗读
-        SwitchingChunk(true), // 切换朗读段落
     }
 
     private val _ttsState = mutableStateOf(TtsState.Uninitialized)
@@ -108,6 +159,12 @@ class MainActivity : ComponentActivity() {
     private var isTtsInitialized = false
 
     lateinit var navController: NavHostController
+    private lateinit var continuousUsageReminderManager: ContinuousUsageReminderManager
+    private var pendingContentOpenIdentity: TrackedContentIdentity? = null
+    private var pendingContentOpenFrom: String? = null
+    private var currentMainTabOpenFrom: String? = null
+    var mainTabNavigationTarget by mutableStateOf<TopLevelDestination?>(null)
+        private set
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -138,12 +195,17 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         clearShareImageCache(this)
         enableEdgeToEdgeCompat()
+        continuousUsageReminderManager = ContinuousUsageReminderManager(this)
         history = HistoryStorage(this)
         AccountData.loadData(this)
-        ThemeManager.initialize(this)
+        AndroidThemeSettings.initialize(this)
+        AndroidContentFilterRuntime.semanticMatcher = NlpServiceKeywordSemanticMatcher
+        AndroidContentFilterRuntime.keywordWeightExtractor = KeywordWeightExtractor { text, topN ->
+            NLPService.extractKeywordsWithWeight(text, topN)
+        }
 
-        val preferences = getSharedPreferences(PREFERENCE_NAME, MODE_PRIVATE)
-        val lastLaunchTimestamp = preferences.getLong(KEY_LAST_LAUNCH_TIMESTAMP, 0L)
+        val settings = androidSettingsStore(this)
+        val lastLaunchTimestamp = settings.getLong(KEY_LAST_LAUNCH_TIMESTAMP, 0L)
         val now = System.currentTimeMillis()
         if (now - lastLaunchTimestamp >= TimeUnit.DAYS.toMillis(1)) {
             val client = httpClient
@@ -155,12 +217,8 @@ class MainActivity : ComponentActivity() {
                 } catch (e: Exception) {
                     Log.e(TAG, "Failed to refresh Zhihu token", e)
                     withContext(Dispatchers.Main) {
-                        Toast
-                            .makeText(
-                                this@MainActivity,
-                                "刷新登录状态失败，如多次看到此提示请重新登录",
-                                Toast.LENGTH_LONG,
-                            ).show()
+                        androidUserMessageSink(this@MainActivity)
+                            .showLongMessage("刷新登录状态失败，如多次看到此提示请重新登录")
                     }
                 }
                 if (!PowerSaveModeCompat.getPowerSaveMode(this@MainActivity).isPowerSaveMode) {
@@ -172,12 +230,13 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-        preferences.edit { putLong(KEY_LAST_LAUNCH_TIMESTAMP, now) }
+        settings.putLong(KEY_LAST_LAUNCH_TIMESTAMP, now)
 
         // 应用启动时执行内容过滤数据库清理
         lifecycleScope.launch {
             try {
-                ContentFilterExtensions.performMaintenanceCleanup(this@MainActivity)
+                getContentFilterDatabase(this@MainActivity)
+                    .performContentFilterMaintenanceCleanup(contentFilterSettings())
                 Log.i(TAG, "Content filter maintenance cleanup completed")
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to perform content filter cleanup", e)
@@ -199,7 +258,7 @@ class MainActivity : ComponentActivity() {
             navController = rememberNavController()
             ZhihuTheme {
                 Box(Modifier.semantics { testTagsAsResourceId = true }) {
-                    ZhihuMain(navController = navController)
+                    AndroidZhihuMain(navController = navController)
                 }
             }
         }
@@ -274,7 +333,7 @@ class MainActivity : ComponentActivity() {
                             Log.i(TAG, "Using Pico TTS engine")
                             ttsState = TtsState.Ready
                         } else {
-                            Log.e(TAG, "Pico TTS engine Initialization failed")
+                            Log.w(TAG, "Pico TTS engine unavailable on this device")
                             ttsState = TtsState.Error
                         }
                     }, picoEngine)
@@ -289,7 +348,7 @@ class MainActivity : ComponentActivity() {
                             Log.i(TAG, "Using Sherpa TTS engine")
                             ttsState = TtsState.Ready
                         } else {
-                            Log.e(TAG, "Sherpa TTS engine Initialization failed")
+                            Log.w(TAG, "Sherpa TTS engine unavailable on this device")
                             ttsState = TtsState.Error
                         }
                     }, sherpaEngine)
@@ -300,11 +359,49 @@ class MainActivity : ComponentActivity() {
                     ttsEngine = TtsEngine.Google
                 }
             } else {
-                Log.e(TAG, "TTS Initialization failed")
+                Log.w(TAG, "TTS unavailable on this device")
                 ttsState = TtsState.Error
             }
         }
+<<<<<<< HEAD
+=======
+
+        // 自动检查更新（在应用启动时）
+        if (savedInstanceState == null) {
+            @OptIn(DelicateCoroutinesApi::class)
+            GlobalScope.launch {
+                try {
+                    UpdateManager.autoCheckForUpdate(this@MainActivity)
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to check for updates", e)
+                }
+            }
+        }
+>>>>>>> afb58205039fb418bd264b83544cc9e612ab9299
     }
+
+    override fun onStart() {
+        super.onStart()
+        continuousUsageReminderManager.onAppForeground()
+    }
+
+    override fun onStop() {
+        continuousUsageReminderManager.onAppBackground()
+        super.onStop()
+    }
+
+    override val developerRuntimeInfo: DeveloperRuntimeInfo
+        get() = DeveloperRuntimeInfo(
+            continuousUsageDurationMs = continuousUsageReminderManager.currentElapsedForegroundMs(),
+            ttsState = ttsState,
+            currentTtsEngineLabel = when (ttsEngine) {
+                TtsEngine.Pico -> "Pico TTS"
+                TtsEngine.Google -> "Google TTS"
+                TtsEngine.Sherpa -> "Sherpa TTS"
+                TtsEngine.Uninitialized -> "未初始化"
+            },
+            availableTtsEngineLabels = textToSpeech?.engines?.map { it.name }.orEmpty(),
+        )
 
     private fun initializeTtsSettings() {
         // 设置语言
@@ -313,7 +410,7 @@ class MainActivity : ComponentActivity() {
             // 如果中文不支持，尝试英文
             val englishResult = textToSpeech?.setLanguage(Locale.ENGLISH)
             if (englishResult == TextToSpeech.LANG_MISSING_DATA || englishResult == TextToSpeech.LANG_NOT_SUPPORTED) {
-                Log.e(TAG, "Language not supported")
+                Log.w(TAG, "TTS language not supported on this device")
                 ttsState = TtsState.Error
             } else {
                 Log.i(TAG, "Using English language for TTS")
@@ -344,7 +441,7 @@ class MainActivity : ComponentActivity() {
             if (intent.data != null) {
                 if (intent.data!!.authority != "zhihu-plus.internal") {
                     Log.i(TAG, "Intent data: ${intent.data}")
-                    val destination = resolveContent(intent.data!!)
+                    val destination = resolveContent(intent.data.toString())
                     if (destination != null) {
                         if (destination != sharedData.clipboardDestination) {
                             sharedData.clipboardDestination = destination
@@ -370,7 +467,7 @@ class MainActivity : ComponentActivity() {
                     if (text != null) {
                         val regex = Regex("""https?://[-a-zA-Z0-9@:%_+.~#?&/=]*""")
                         val destination = regex.findAll(text).firstNotNullOfOrNull {
-                            resolveContent(it.value.toUri())
+                            resolveContent(it.value)
                         }
                         if (destination != null && destination != sharedData.clipboardDestination) {
                             sharedData.clipboardDestination = destination
@@ -383,17 +480,16 @@ class MainActivity : ComponentActivity() {
     }
 
     fun navigate(route: NavDestination, popup: Boolean = false) {
+        preparePendingContentOpen(route)
         history.add(route)
         if (route is Video) {
             val current = runCatching {
                 navController.currentBackStackEntry?.toRoute<Article>()
             }.getOrNull() ?: runCatching {
-                navController.previousBackStackEntry?.toRoute<Question>()
+                navController.currentBackStackEntry?.toRoute<Question>()
             }.getOrNull()
             if (current == null) {
-                Toast
-                    .makeText(this, "无法打开视频：未知的内容类型", Toast.LENGTH_SHORT)
-                    .show()
+                androidUserMessageSink(this).showShortMessage("无法打开视频：未知的内容类型")
                 return
             }
             val (contentId, contentType) = when (current) {
@@ -411,19 +507,27 @@ class MainActivity : ComponentActivity() {
             CoroutineScope(Dispatchers.Main).launch {
                 val videoUrl = getHighestQualityVideoUrl(this@MainActivity, httpClient, route.id.toString(), contentId, contentType)
                 if (videoUrl == null) {
-                    Toast
-                        .makeText(this@MainActivity, "获取视频链接失败", Toast.LENGTH_SHORT)
-                        .show()
+                    androidUserMessageSink(this@MainActivity).showShortMessage("获取视频链接失败")
                     return@launch
                 }
-                luoTianYiUrlLauncher(this@MainActivity, videoUrl.toUri())
+                startActivity(
+                    Intent(this@MainActivity, VideoPlayerActivity::class.java).apply {
+                        putExtra("video_url", videoUrl)
+                        putExtra("video_id", route.id)
+                    },
+                )
             }
+            return
+        }
+        if (route == MainTabs) {
+            mainTabNavigationTarget = Home
+            navigateToMainTabs()
             return
         }
         navController.navigate(route) {
             if (popup) {
                 launchSingleTop = true
-                popUpTo(Home) {
+                popUpTo(MainTabs) {
                     // clear the back stack and viewModels
                     saveState = true
                 }
@@ -431,11 +535,97 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    fun postHistory(dest: NavDestination) {
-        history.add(dest)
+    override fun consumePendingContentOpenFrom(destination: NavDestination): String {
+        val identity = ContentOpenEventSupport.toTrackedContentIdentity(destination) ?: return ContentOpenFrom.UNKNOWN
+        if (identity != pendingContentOpenIdentity) {
+            return ContentOpenFrom.UNKNOWN
+        }
+        val openFrom = pendingContentOpenFrom ?: ContentOpenFrom.UNKNOWN
+        pendingContentOpenIdentity = null
+        pendingContentOpenFrom = null
+        return openFrom
     }
 
+<<<<<<< HEAD
+=======
+    private fun preparePendingContentOpen(target: NavDestination) {
+        val identity = ContentOpenEventSupport.toTrackedContentIdentity(target)
+        if (identity == null) {
+            pendingContentOpenIdentity = null
+            pendingContentOpenFrom = null
+            return
+        }
+        pendingContentOpenIdentity = identity
+        pendingContentOpenFrom = if (
+            runCatching { navController.currentBackStackEntry?.toRoute<MainTabs>() }.getOrNull() != null
+        ) {
+            currentMainTabOpenFrom
+        } else {
+            null
+        }
+            ?: ContentOpenEventSupport.inferOpenFrom(currentContentOpenSource(), target)
+    }
+
+    private fun navigateToMainTabs() {
+        navController.navigate(MainTabs) {
+            launchSingleTop = true
+            restoreState = true
+            popUpTo(MainTabs) {
+                saveState = true
+            }
+        }
+    }
+
+    fun navigateMainTab(destination: TopLevelDestination) {
+        mainTabNavigationTarget = destination
+        navigateToMainTabs()
+    }
+
+    fun setCurrentMainTabOpenFrom(openFrom: String?) {
+        currentMainTabOpenFrom = openFrom
+    }
+
+    fun consumeMainTabNavigationTarget(destination: TopLevelDestination) {
+        if (mainTabNavigationTarget == destination) {
+            mainTabNavigationTarget = null
+        }
+    }
+
+    private fun currentContentOpenSource(): NavDestination? {
+        val currentEntry = navController.currentBackStackEntry
+        return runCatching {
+            currentEntry?.toRoute<Article>()
+        }.getOrNull() ?: runCatching {
+            currentEntry?.toRoute<Question>()
+        }.getOrNull() ?: runCatching {
+            currentEntry?.toRoute<Pin>()
+        }.getOrNull() ?: runCatching {
+            currentEntry?.toRoute<CollectionContent>()
+        }.getOrNull() ?: runCatching {
+            currentEntry?.toRoute<History>()
+        }.getOrNull() ?: runCatching {
+            currentEntry?.toRoute<Notification>()
+        }.getOrNull()
+    }
+
+    override fun postHistoryDestination(destination: NavDestination) {
+        history.add(destination)
+    }
+
+    override fun speakArticleText(
+        text: String,
+        title: String,
+    ) {
+        speakText(text, title)
+    }
+
+    override fun stopArticleSpeaking() {
+        stopSpeaking()
+    }
+
+>>>>>>> afb58205039fb418bd264b83544cc9e612ab9299
     override fun onDestroy() {
+        continuousUsageReminderManager.onDestroy()
         textToSpeech?.shutdown()
         super.onDestroy()
     }
@@ -471,9 +661,7 @@ class MainActivity : ComponentActivity() {
                         textToSpeech?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
                             override fun onStart(utteranceId: String?) {
                                 if (currentIndex == 0) {
-                                    Toast
-                                        .makeText(this@MainActivity, "开始朗读：$title", Toast.LENGTH_SHORT)
-                                        .show()
+                                    androidUserMessageSink(this@MainActivity).showShortMessage("开始朗读：$title")
                                 }
                                 if (utteranceId == "chunk_$currentIndex") {
                                     ttsState = TtsState.Speaking
@@ -506,7 +694,7 @@ class MainActivity : ComponentActivity() {
                             }
 
                             @Suppress("OVERRIDE_DEPRECATION")
-                            override fun onError(p0: String?) { }
+                            override fun onError(p0: String?) = Unit
 
                             override fun onError(utteranceId: String?, errorCode: Int) {
                                 if (utteranceId == "chunk_$currentIndex") {
@@ -560,15 +748,13 @@ class MainActivity : ComponentActivity() {
         ttsState = TtsState.Ready
     }
 
-    fun isSpeaking(): Boolean = textToSpeech?.isSpeaking ?: false
-
     @Suppress("unused")
     companion object {
         private const val KEY_LAST_LAUNCH_TIMESTAMP = "last_main_launch_timestamp"
         const val IOS = "5_2.0"
         const val ANDROID = "4_2.0"
         const val WEB = "3_2.0"
-        const val ZSE93 = "101_3_3.0"
+        const val ZSE93 = ZHIHU_WEB_ZSE93
         const val TAG = "MainActivity"
     }
 }

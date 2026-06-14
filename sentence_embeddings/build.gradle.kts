@@ -1,5 +1,10 @@
 plugins {
+<<<<<<< HEAD
     id("com.android.library") version "9.1.1"
+=======
+    id("com.android.library")
+    kotlin("android")
+>>>>>>> afb58205039fb418bd264b83544cc9e612ab9299
 }
 
 // Used in GitHub CI to pass the path of the installed Android NDK
@@ -7,7 +12,7 @@ val envAndroidNDKPath = System.getenv("ANDROID_NDK_HOME")
 
 android {
     namespace = "com.ml.shubham0204.sentence_embeddings"
-    compileSdk = 35
+    compileSdk = 36
 
     // Declare the ndkVersion to avoid 'NDK not installed' errors from rust-android-plugin
     // see: https://github.com/mozilla/rust-android-gradle/issues/29#issuecomment-593501017
@@ -32,14 +37,22 @@ android {
         }
     }
     compileOptions {
+<<<<<<< HEAD
         sourceCompatibility = JavaVersion.VERSION_24
         targetCompatibility = JavaVersion.VERSION_24
+=======
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    kotlin {
+        jvmToolchain(17)
+>>>>>>> afb58205039fb418bd264b83544cc9e612ab9299
     }
 
     androidResources {
         noCompress += "onnx"
     }
-    
+
     sourceSets {
         getByName("main") {
             jniLibs.srcDirs("src/main/jniLibs")
