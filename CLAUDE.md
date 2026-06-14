@@ -26,6 +26,27 @@
 
 ## 关键约定
 
+### GitHub 资源加速访问
+
+**所有从 GitHub 下载的命令都必须使用 xget 加速连接。**
+
+转换规则：
+- 普通仓库: `https://github.com/...` → `https://xget.maremagnum.dpdns.org/gh/...`
+- Gist: `https://gist.github.com/...` → `https://xget.maremagnum.dpdns.org/gist/...`
+
+**示例：**
+```
+# 原始 URL
+https://github.com/microsoft/vscode/archive/refs/heads/main.zip
+# 转换后（添加 gh 前缀）
+https://xget.maremagnum.dpdns.org/gh/microsoft/vscode/archive/refs/heads/main.zip
+
+# 原始 URL
+https://gist.github.com/xixu-me/e2ea9db6b1f143892495f796fef18631/raw/3b8807172ee492d0da3a7e370b0fb88fc97b53e6/Free-ChatGPT-Paid-Plan.md
+# 转换后（添加 gist 前缀）
+https://xget.maremagnum.dpdns.org/gist/xixu-me/e2ea9db6b1f143892495f796fef18631/raw/3b8807172ee492d0da3a7e370b0fb88fc97b53e6/Free-ChatGPT-Paid-Plan.md
+```
+
 ### 数据序列化
 - **DataHolder** 和 data classes 使用 `camelCase`
 - **知乎 API** 返回 `snake_case`

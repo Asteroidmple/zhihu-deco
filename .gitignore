@@ -1,68 +1,156 @@
-# Gradle files
+# ============================================================================
+# 构建产物 - Build Artifacts
+# ============================================================================
+# Gradle
 .gradle/
 build/
+**/build/
+!gradle/wrapper/gradle-wrapper.jar
 
-# Local configuration file (sdk path, etc)
-local.properties
+# Android
+*.apk
+*.aab
+*.ap_
+*.dex
+*.class
+bin/
+gen/
+out/
 
-# Log/OS Files
-*.log
-.DS_Store
-
-# Android Studio generated files and folders
-captures/
+# Native
+*.so
+*.o
+*.a
+*.dll
+*.dylib
 .externalNativeBuild/
 .cxx/
-*.apk
-output.json
-
-# IntelliJ
-*.iml
-.idea/
-!.idea/codeStyles/*
-!.idea/dictionaries/*
-misc.xml
-deploymentTargetDropDown.xml
-render.experimental.xml
-
-# Keystore files
-*.jks
-*.keystore
-
-# Google Services (e.g. APIs or Firebase)
-google-services.json
-
-# Android Profiling
-*.hprof
 
 # Kotlin
 .kotlin/
 
-# Temporary files
-.tmp/
-/.trae
+# ============================================================================
+# IDE 配置 - IDE Configuration
+# ============================================================================
+# Android Studio / IntelliJ
+.idea/
+*.iml
+*.ipr
+*.iws
+misc.xml
+deploymentTargetDropDown.xml
+render.experimental.xml
 
-# IDE specific files
-.claude/
+# VS Code
+.vscode/
+
+# Trae IDE
+.trae/
 .trae-skills/
 .trae-cn-skills/
 
-# Oh my codex
-.omx/
+# ============================================================================
+# 隐私/敏感文件 - Privacy/Sensitive Files
+# ============================================================================
+# 本地配置 (SDK路径、API密钥等)
+local.properties
+gradle.properties
 
-# Python cache
+# 密钥库
+*.jks
+*.keystore
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Google Services
+google-services.json
+GoogleService-Info.plist
+
+# 签名配置
+signing.properties
+keystore.properties
+
+# 环境变量
+.env
+.env.local
+.env.*.local
+
+# ============================================================================
+# 日志与调试 - Logs & Debugging
+# ============================================================================
+*.log
+*.hprof
+*.trace
+captures/
+
+# ============================================================================
+# 系统文件 - OS Files
+# ============================================================================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ============================================================================
+# 临时文件 - Temporary Files
+# ============================================================================
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+.tmp/
+
+# ============================================================================
+# Python 缓存 - Python Cache
+# ============================================================================
 __pycache__/
-*.pyc
-*.pyo
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
 
-# Unused Rust projects (replaced by sentence_embeddings)
+# ============================================================================
+# 依赖目录 - Dependencies
+# ============================================================================
+node_modules/
+vendor/
+
+# ============================================================================
+# 测试/覆盖率 - Testing & Coverage
+# ============================================================================
+*.ec
+coverage/
+.jacoco/
+
+# ============================================================================
+# 本地数据 - Local Data
+# ============================================================================
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# ============================================================================
+# 项目特定 - Project Specific
+# ============================================================================
+# 未使用的旧项目
 rs-hf-tokenizer/
 rs-zse-sign/
 apk-recompress/
 
-# Unused misc files
+# 杂项脚本
 misc/emoji.py
 misc/tampermonkey.js
 misc/htk-inject-system-cert.sh
 misc/icon.svg
 misc/zse-ck-v4-*.js
+
+# 本地补丁文件
+*.patch
+local_changes.patch
+
+# 其他 IDE/工具
+.claude/
+.omx/
