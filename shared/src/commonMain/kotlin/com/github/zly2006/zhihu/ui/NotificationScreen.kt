@@ -17,10 +17,6 @@
 
 package com.github.zly2006.zhihu.ui
 
-<<<<<<< HEAD:app/src/main/java/com/github/zly2006/zhihu/ui/NotificationScreen.kt
-import android.widget.Toast
-=======
->>>>>>> afb58205039fb418bd264b83544cc9e612ab9299:shared/src/commonMain/kotlin/com/github/zly2006/zhihu/ui/NotificationScreen.kt
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -65,23 +61,6 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
-<<<<<<< HEAD:app/src/main/java/com/github/zly2006/zhihu/ui/NotificationScreen.kt
-import com.github.zly2006.zhihu.Article
-import com.github.zly2006.zhihu.ArticleType
-import com.github.zly2006.zhihu.LocalNavigator
-import com.github.zly2006.zhihu.Notification
-import com.github.zly2006.zhihu.Person
-import com.github.zly2006.zhihu.Question
-import com.github.zly2006.zhihu.data.NotificationItem
-import com.github.zly2006.zhihu.data.NotificationTarget
-import com.github.zly2006.zhihu.ui.components.PaginatedList
-import com.github.zly2006.zhihu.ui.components.ProgressIndicatorFooter
-import com.github.zly2006.zhihu.viewmodel.NotificationViewModel
-import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
-=======
 import com.github.zly2006.zhihu.navigation.Article
 import com.github.zly2006.zhihu.navigation.ArticleType
 import com.github.zly2006.zhihu.navigation.LocalNavigator
@@ -102,7 +81,6 @@ import com.github.zly2006.zhihu.viewmodel.NotificationEnvironment
 import com.github.zly2006.zhihu.viewmodel.NotificationViewModel
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
->>>>>>> afb58205039fb418bd264b83544cc9e612ab9299:shared/src/commonMain/kotlin/com/github/zly2006/zhihu/ui/NotificationScreen.kt
 
 data class NotificationScreenRuntime(
     val environment: NotificationEnvironment,
@@ -239,8 +217,6 @@ fun NotificationScreen() {
                     )
                 }
             }
-<<<<<<< HEAD:app/src/main/java/com/github/zly2006/zhihu/ui/NotificationScreen.kt
-=======
             if (runtime.showDebugCopy) {
                 DraggableRefreshButton(
                     onClick = {
@@ -250,10 +226,9 @@ fun NotificationScreen() {
                     },
                     preferenceName = "copyAll",
                 ) {
-                    Icon(Icons.Default.CopyAll, contentDescription = "复制")
+                    Icon(Icons.Default.Settings, contentDescription = "复制")
                 }
             }
->>>>>>> afb58205039fb418bd264b83544cc9e612ab9299:shared/src/commonMain/kotlin/com/github/zly2006/zhihu/ui/NotificationScreen.kt
         }
     }
 }
@@ -294,7 +269,7 @@ fun NotificationItemView(
                     if (extend?.icon != null) {
                         AsyncImage(
                             model = extend.icon,
-                            contentDescription = "",
+                            contentDescription = "通知图标",
                             modifier = Modifier
                                 .size(40.dp)
                                 .clip(CircleShape)

@@ -20,7 +20,12 @@ package com.github.zly2006.zhihu.ui
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -36,6 +41,7 @@ import com.github.zly2006.zhihu.shared.platform.UserMessageDuration
 import com.github.zly2006.zhihu.shared.platform.rememberSettingsStore
 import com.github.zly2006.zhihu.shared.platform.rememberUserMessageSink
 import com.github.zly2006.zhihu.ui.components.BlockUserConfirmDialog
+import com.github.zly2006.zhihu.ui.components.DraggableRefreshButton
 import com.github.zly2006.zhihu.ui.components.FeedCard
 import com.github.zly2006.zhihu.ui.components.FeedPullToRefresh
 import com.github.zly2006.zhihu.ui.components.PaginatedList
@@ -96,8 +102,6 @@ fun HotListScreen(
                     thumbnailUrl = (item.feed as? HotListFeed)?.children?.firstOrNull()?.thumbnail,
                 )
             }
-<<<<<<< HEAD:app/src/main/java/com/github/zly2006/zhihu/ui/HotListScreen.kt
-=======
 
             val showRefreshFab = remember { settings.getBoolean("showRefreshFab", true) }
             if (showRefreshFab) {
@@ -114,7 +118,6 @@ fun HotListScreen(
                     }
                 }
             }
->>>>>>> afb58205039fb418bd264b83544cc9e612ab9299:shared/src/commonMain/kotlin/com/github/zly2006/zhihu/ui/HotListScreen.kt
         }
 
         // 屏蔽用户确认弹窗。

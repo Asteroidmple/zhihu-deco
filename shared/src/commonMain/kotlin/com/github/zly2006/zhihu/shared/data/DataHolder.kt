@@ -144,6 +144,7 @@ object DataHolder {
 
     @Serializable
     data class Relationship(
+        // v4 API 移除了 isAuthor, isAuthorized, isNothelp, isFavorited, isThanked, voting 字段
         val upvotedFollowees: List<String> = emptyList(),
     )
 

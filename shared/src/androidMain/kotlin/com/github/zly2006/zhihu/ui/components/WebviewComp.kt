@@ -44,6 +44,7 @@ import android.webkit.WebView
 import android.widget.FrameLayout
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -495,11 +496,7 @@ fun WebviewComp(
     modifier: Modifier = Modifier.wrapContentSize(),
     scrollState: ScrollState? = null,
     existingWebView: CustomWebView? = null,
-<<<<<<< HEAD:app/src/main/java/com/github/zly2006/zhihu/ui/components/WebviewComp.kt
-    useContentHeight: Boolean = true, // 是否根据内容高度调整 WebView 高度
-=======
     onDoubleTap: (() -> Unit)? = null,
->>>>>>> afb58205039fb418bd264b83544cc9e612ab9299:shared/src/androidMain/kotlin/com/github/zly2006/zhihu/ui/components/WebviewComp.kt
     onLoad: (CustomWebView) -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -540,7 +537,7 @@ fun WebviewComp(
             view.onDoubleTapCallback = onDoubleTap
             onLoad(view)
         },
-        modifier = if (useContentHeight && contentHeightDp > 0) {
+        modifier = if (contentHeightDp > 0) {
             modifier.height(contentHeightDp.dp)
         } else {
             modifier

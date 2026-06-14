@@ -1,11 +1,5 @@
 pluginManagement {
     repositories {
-<<<<<<< HEAD
-        maven { url = uri("https://maven.aliyun.com/repository/google") }
-        maven { url = uri("https://maven.aliyun.com/repository/public") }
-        maven { url = uri("https://maven.aliyun.com/repository/gradle-plugin") }
-        google()
-=======
         google {
             mavenContent {
                 includeGroupAndSubgroups("androidx")
@@ -13,7 +7,6 @@ pluginManagement {
                 includeGroupAndSubgroups("com.google")
             }
         }
->>>>>>> afb58205039fb418bd264b83544cc9e612ab9299
         mavenCentral()
         gradlePluginPortal()
     }
@@ -28,12 +21,6 @@ buildCache {
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
-<<<<<<< HEAD
-        maven { url = uri("https://maven.aliyun.com/repository/google") }
-        maven { url = uri("https://maven.aliyun.com/repository/public") }
-        maven { url = uri("https://maven.aliyun.com/repository/central") }
-        google()
-=======
         mavenLocal()
         google {
             mavenContent {
@@ -42,7 +29,6 @@ dependencyResolutionManagement {
                 includeGroupAndSubgroups("com.google")
             }
         }
->>>>>>> afb58205039fb418bd264b83544cc9e612ab9299
         mavenCentral()
         maven("https://www.jitpack.io")
     }

@@ -22,16 +22,9 @@ import android.net.Uri
 import androidx.browser.customtabs.CustomTabColorSchemeParams
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
-<<<<<<< HEAD:app/src/main/java/com/github/zly2006/zhihu/util/Utils.kt
-import com.github.zly2006.zhihu.MainActivity
-import com.github.zly2006.zhihu.data.AccountData
-import com.github.zly2006.zhihu.data.AccountData.json
-import com.github.zly2006.zhihu.BuildConfig
-=======
 import com.github.zly2006.zhihu.data.AccountData
 import com.github.zly2006.zhihu.shared.platform.androidSettingsStore
 import com.github.zly2006.zhihu.shared.util.signZhihuFetchRequest
->>>>>>> afb58205039fb418bd264b83544cc9e612ab9299:shared/src/androidMain/kotlin/com/github/zly2006/zhihu/util/Utils.kt
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.header
 import io.ktor.client.request.post
@@ -57,16 +50,11 @@ fun telemetry(context: Context, usage: String, scope: CoroutineScope = telemetry
     }
     val settings = androidSettingsStore(context)
     val data = AccountData.loadData(context)
-<<<<<<< HEAD:app/src/main/java/com/github/zly2006/zhihu/util/Utils.kt
-    if (preferences.getBoolean("allowTelemetry", true)) {
-        scope.launch {
-=======
     if (settings.getBoolean("allowTelemetry", true)) {
         val versionName = runCatching {
             context.packageManager.getPackageInfo(context.packageName, 0).versionName
         }.getOrNull() ?: "unknown"
-        GlobalScope.launch {
->>>>>>> afb58205039fb418bd264b83544cc9e612ab9299:shared/src/androidMain/kotlin/com/github/zly2006/zhihu/util/Utils.kt
+        scope.launch {
             @OptIn(ExperimentalStdlibApi::class)
             runCatching {
                 val hash = MessageDigest
@@ -87,11 +75,7 @@ fun telemetry(context: Context, usage: String, scope: CoroutineScope = telemetry
                         contentType(ContentType.Application.Json)
                         header(
                             HttpHeaders.UserAgent,
-<<<<<<< HEAD:app/src/main/java/com/github/zly2006/zhihu/util/Utils.kt
-                            "Zhihu-deco/${BuildConfig.VERSION_NAME}",
-=======
                             "Zhihu++/$versionName",
->>>>>>> afb58205039fb418bd264b83544cc9e612ab9299:shared/src/androidMain/kotlin/com/github/zly2006/zhihu/util/Utils.kt
                         )
                     }
             }

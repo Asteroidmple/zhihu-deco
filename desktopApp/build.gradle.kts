@@ -22,15 +22,9 @@ ktlint {
 }
 
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(25)
     compilerOptions {
-        jvmTarget = JvmTarget.JVM_17
-    }
-}
-
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
+        jvmTarget = JvmTarget.JVM_25
     }
 }
 

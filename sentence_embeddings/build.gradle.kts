@@ -1,10 +1,6 @@
 plugins {
-<<<<<<< HEAD
-    id("com.android.library") version "9.1.1"
-=======
     id("com.android.library")
     kotlin("android")
->>>>>>> afb58205039fb418bd264b83544cc9e612ab9299
 }
 
 // Used in GitHub CI to pass the path of the installed Android NDK
@@ -37,16 +33,11 @@ android {
         }
     }
     compileOptions {
-<<<<<<< HEAD
-        sourceCompatibility = JavaVersion.VERSION_24
-        targetCompatibility = JavaVersion.VERSION_24
-=======
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_25
+        targetCompatibility = JavaVersion.VERSION_25
     }
     kotlin {
-        jvmToolchain(17)
->>>>>>> afb58205039fb418bd264b83544cc9e612ab9299
+        jvmToolchain(25)
     }
 
     androidResources {
@@ -153,14 +144,15 @@ tasks.register<Delete>("cleanRust") {
     delete(jniLibsDir)
 }
 
-// TEMPORARILY DISABLED: Rust compilation not required for basic functionality
-// Uncomment these lines if you need Rust features and have cargo-ndk installed
-// tasks.named("clean") {
-//     dependsOn("cleanRust")
-// }
-// tasks.matching { it.name.startsWith("preBuild") }.configureEach {
-//     dependsOn("buildRustLib")
-// }
+// Make clean depend on cleanRust
+tasks.named("clean") {
+    dependsOn("cleanRust")
+}
+
+// Make preBuild depend on buildRustLib
+tasks.matching { it.name.startsWith("preBuild") }.configureEach {
+    dependsOn("buildRustLib")
+}
 
 dependencies {
     implementation("androidx.core:core-ktx:1.17.0")

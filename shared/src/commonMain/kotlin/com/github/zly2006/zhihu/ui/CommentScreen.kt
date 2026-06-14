@@ -19,10 +19,8 @@ package com.github.zly2006.zhihu.ui
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -45,11 +43,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
-<<<<<<< HEAD:app/src/main/java/com/github/zly2006/zhihu/ui/CommentScreen.kt
-import androidx.compose.foundation.layout.imePadding
-=======
 import androidx.compose.foundation.layout.navigationBarsPadding
->>>>>>> afb58205039fb418bd264b83544cc9e612ab9299:shared/src/commonMain/kotlin/com/github/zly2006/zhihu/ui/CommentScreen.kt
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -105,15 +99,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
-<<<<<<< HEAD:app/src/main/java/com/github/zly2006/zhihu/ui/CommentScreen.kt
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-=======
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
->>>>>>> afb58205039fb418bd264b83544cc9e612ab9299:shared/src/commonMain/kotlin/com/github/zly2006/zhihu/ui/CommentScreen.kt
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -325,9 +315,9 @@ fun SwipeToReplyContainer(
                         scope.launch {
                             offsetX.animateTo(
                                 targetValue = 0f,
-                                animationSpec = tween(
-                                    durationMillis = 300,
-                                    easing = FastOutSlowInEasing,
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                    stiffness = Spring.StiffnessLow,
                                 ),
                             )
                             hasVibrated = false
@@ -440,13 +430,8 @@ fun CommentScreen(
     listState: LazyListState = rememberLazyListState(),
     testOverrides: CommentScreenTestOverrides? = null,
 ) {
-<<<<<<< HEAD:app/src/main/java/com/github/zly2006/zhihu/ui/CommentScreen.kt
-    val context = LocalContext.current
-    val keyboardController = LocalSoftwareKeyboardController.current
-=======
     val paginationEnvironment = rememberPaginationEnvironment(allowGuestAccess = false)
     val runtime = rememberCommentScreenRuntime()
->>>>>>> afb58205039fb418bd264b83544cc9e612ab9299:shared/src/commonMain/kotlin/com/github/zly2006/zhihu/ui/CommentScreen.kt
     var commentInput by remember { mutableStateOf("") }
     var isSending by remember { mutableStateOf(false) }
     var replyToComment by remember { mutableStateOf<CommentModel?>(null) }
@@ -516,7 +501,6 @@ fun CommentScreen(
             commentInput = ""
             replyToComment = null
             isSending = false
-            keyboardController?.hide()
             coroutineScope.launch {
                 listState.animateScrollToItem(
                     0,
@@ -540,22 +524,9 @@ fun CommentScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-<<<<<<< HEAD:app/src/main/java/com/github/zly2006/zhihu/ui/CommentScreen.kt
-                    .imePadding() // 添加 imePadding 确保整体适配输入法
-                    .padding(bottom = WindowInsets.systemBars.asPaddingValues().calculateBottomPadding()),
-            ) {
-                CommentTopText(content())
-                // 评论列表区域 - 使用 weight(1f) 占据剩余空间
-                Box(
-                    modifier = Modifier
-                        .weight(1f) // 占据除输入框外的所有剩余空间
-                        .fillMaxWidth(),
-                ) {
-=======
                     .navigationBarsPadding(),
             ) {
                 Box(modifier = Modifier.weight(1f)) {
->>>>>>> afb58205039fb418bd264b83544cc9e612ab9299:shared/src/commonMain/kotlin/com/github/zly2006/zhihu/ui/CommentScreen.kt
                     when {
                         viewModel.isLoading && viewModel.allData.isEmpty() -> {
                             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -843,13 +814,8 @@ fun CommentScreen(
                 // 评论输入框
                 Surface(
                     tonalElevation = 2.dp,
-<<<<<<< HEAD:app/src/main/java/com/github/zly2006/zhihu/ui/CommentScreen.kt
-                    modifier = Modifier
-                        .fillMaxWidth(),
-=======
                     modifier = Modifier.fillMaxWidth(),
                     color = commentInputBarColor,
->>>>>>> afb58205039fb418bd264b83544cc9e612ab9299:shared/src/commonMain/kotlin/com/github/zly2006/zhihu/ui/CommentScreen.kt
                 ) {
                     Column {
                         // 回复目标提示栏。

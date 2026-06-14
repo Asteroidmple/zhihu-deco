@@ -1,161 +1,45 @@
-# ============================================================================
-# 构建产物 - Build Artifacts
-# ============================================================================
-# Gradle
+# Gradle files
 .gradle/
 build/
-**/build/
-!gradle/wrapper/gradle-wrapper.jar
 
-# Android
-*.apk
-*.aab
-*.ap_
-*.dex
-*.class
-bin/
-gen/
-out/
+# Local configuration file (sdk path, etc)
+local.properties
 
-# Native
-*.so
-*.o
-*.a
-*.dll
-*.dylib
+# Log/OS Files
+*.log
+.DS_Store
+
+# Android Studio generated files and folders
+captures/
 .externalNativeBuild/
 .cxx/
+*.apk
+output.json
 
-# Kotlin
-.kotlin/
-
-# ============================================================================
-# IDE 配置 - IDE Configuration
-# ============================================================================
-# Android Studio / IntelliJ
-.idea/
+# IntelliJ
 *.iml
-*.ipr
-*.iws
+.idea/
+!.idea/codeStyles/*
+!.idea/dictionaries/*
 misc.xml
 deploymentTargetDropDown.xml
 render.experimental.xml
 
-# VS Code
-.vscode/
-
-# Trae IDE
-.trae/
-.trae-skills/
-.trae-cn-skills/
-
-# ============================================================================
-# 隐私/敏感文件 - Privacy/Sensitive Files
-# ============================================================================
-# 本地配置 (SDK路径、API密钥等)
-local.properties
-gradle.properties
-
-# 密钥库
+# Keystore files
 *.jks
 *.keystore
-*.pem
-*.key
-*.p12
-*.pfx
 
-# Google Services
+# Google Services (e.g. APIs or Firebase)
 google-services.json
-GoogleService-Info.plist
 
-# 签名配置
-signing.properties
-keystore.properties
-
-# 环境变量
-.env
-.env.local
-.env.*.local
-
-# ============================================================================
-# 日志与调试 - Logs & Debugging
-# ============================================================================
-*.log
+# Android Profiling
 *.hprof
-*.trace
-captures/
 
-# ============================================================================
-# 系统文件 - OS Files
-# ============================================================================
-.DS_Store
-Thumbs.db
-desktop.ini
+# Kotlin
+.kotlin/
 
-# ============================================================================
-# 临时文件 - Temporary Files
-# ============================================================================
-*.tmp
-*.temp
-*.swp
-*.swo
-*~
+# Temporary files
 .tmp/
-<<<<<<< HEAD
-
-# ============================================================================
-# Python 缓存 - Python Cache
-# ============================================================================
-__pycache__/
-*.py[cod]
-*$py.class
-*.egg-info/
-dist/
-
-# ============================================================================
-# 依赖目录 - Dependencies
-# ============================================================================
-node_modules/
-vendor/
-
-# ============================================================================
-# 测试/覆盖率 - Testing & Coverage
-# ============================================================================
-*.ec
-coverage/
-.jacoco/
-
-# ============================================================================
-# 本地数据 - Local Data
-# ============================================================================
-*.db
-*.db-journal
-*.sqlite
-*.sqlite3
-
-# ============================================================================
-# 项目特定 - Project Specific
-# ============================================================================
-# 未使用的旧项目
-rs-hf-tokenizer/
-rs-zse-sign/
-apk-recompress/
-
-# 杂项脚本
-misc/emoji.py
-misc/tampermonkey.js
-misc/htk-inject-system-cert.sh
-misc/icon.svg
-misc/zse-ck-v4-*.js
-
-# 本地补丁文件
-*.patch
-local_changes.patch
-
-# 其他 IDE/工具
-.claude/
-.omx/
-=======
 .memory/*
 !.memory/.gitkeep
 __pycache__/
@@ -174,4 +58,3 @@ __pycache__/
 # IntelliJ generated apks
 app/lite
 app/full
->>>>>>> afb58205039fb418bd264b83544cc9e612ab9299

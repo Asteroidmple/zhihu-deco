@@ -72,7 +72,6 @@ import com.github.zly2006.zhihu.shared.filter.TrackedContentIdentity
 import com.github.zly2006.zhihu.shared.nlp.KeywordWeightExtractor
 import com.github.zly2006.zhihu.shared.platform.androidSettingsStore
 import com.github.zly2006.zhihu.shared.platform.androidUserMessageSink
-import com.github.zly2006.zhihu.shared.util.ZHIHU_WEB_ZSE93
 import com.github.zly2006.zhihu.theme.AndroidThemeSettings
 import com.github.zly2006.zhihu.theme.ZhihuTheme
 import com.github.zly2006.zhihu.ui.AndroidZhihuMain
@@ -80,13 +79,10 @@ import com.github.zly2006.zhihu.ui.ArticleAnswerSwitchState
 import com.github.zly2006.zhihu.ui.ArticleHost
 import com.github.zly2006.zhihu.ui.TtsState
 import com.github.zly2006.zhihu.ui.components.getHighestQualityVideoUrl
-<<<<<<< HEAD
-=======
 import com.github.zly2006.zhihu.ui.subscreens.DeveloperRuntimeInfo
 import com.github.zly2006.zhihu.ui.subscreens.DeveloperRuntimeInfoProvider
 import com.github.zly2006.zhihu.updater.UpdateManager
 import com.github.zly2006.zhihu.util.ContinuousUsageReminderManager
->>>>>>> afb58205039fb418bd264b83544cc9e612ab9299
 import com.github.zly2006.zhihu.util.EmojiManager
 import com.github.zly2006.zhihu.util.PowerSaveModeCompat
 import com.github.zly2006.zhihu.util.ZhihuCredentialRefresher
@@ -100,9 +96,9 @@ import com.github.zly2006.zhihu.viewmodel.filter.contentFilterSettings
 import com.github.zly2006.zhihu.viewmodel.filter.getContentFilterDatabase
 import com.github.zly2006.zhihu.viewmodel.filter.performContentFilterMaintenanceCleanup
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -268,7 +264,6 @@ class MainActivity :
                 if (intent.data!!.authority == "zhihu-plus.internal") {
                     if (intent.data!!.path == "/error") {
                         val title = intent.data!!.getQueryParameter("title")
-//                        val message = intent.data!!.getQueryParameter("message")
                         val stack = intent.data!!.getQueryParameter("stack")
                         AlertDialog
                             .Builder(this)
@@ -363,13 +358,10 @@ class MainActivity :
                 ttsState = TtsState.Error
             }
         }
-<<<<<<< HEAD
-=======
 
         // 自动检查更新（在应用启动时）
         if (savedInstanceState == null) {
-            @OptIn(DelicateCoroutinesApi::class)
-            GlobalScope.launch {
+            lifecycleScope.launch {
                 try {
                     UpdateManager.autoCheckForUpdate(this@MainActivity)
                 } catch (e: Exception) {
@@ -377,7 +369,6 @@ class MainActivity :
                 }
             }
         }
->>>>>>> afb58205039fb418bd264b83544cc9e612ab9299
     }
 
     override fun onStart() {
@@ -504,7 +495,7 @@ class MainActivity :
                 }
                 else -> error("Unsupported content type for video: $current")
             }
-            CoroutineScope(Dispatchers.Main).launch {
+            lifecycleScope.launch {
                 val videoUrl = getHighestQualityVideoUrl(this@MainActivity, httpClient, route.id.toString(), contentId, contentType)
                 if (videoUrl == null) {
                     androidUserMessageSink(this@MainActivity).showShortMessage("获取视频链接失败")
@@ -546,8 +537,6 @@ class MainActivity :
         return openFrom
     }
 
-<<<<<<< HEAD
-=======
     private fun preparePendingContentOpen(target: NavDestination) {
         val identity = ContentOpenEventSupport.toTrackedContentIdentity(target)
         if (identity == null) {
@@ -623,31 +612,32 @@ class MainActivity :
         stopSpeaking()
     }
 
->>>>>>> afb58205039fb418bd264b83544cc9e612ab9299
     override fun onDestroy() {
         continuousUsageReminderManager.onDestroy()
+        ttsScope.cancel()
         textToSpeech?.shutdown()
         super.onDestroy()
     }
 
     // TTS相关方法
+    private val ttsScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+
     fun speakText(text: String, title: String) {
         if (!isTtsInitialized || textToSpeech == null) return
 
         ttsState = TtsState.LoadingText
 
-        @OptIn(DelicateCoroutinesApi::class)
-        GlobalScope.launch {
+        ttsScope.launch {
             val maxChunkLength = 100
             val textChunks = splitTextIntoChunks(text, maxChunkLength)
 
             // 使用闭包来管理状态和递归调用
-            lateinit var speakNextChunk: (Int) -> Unit
+            lateinit var speakNextChunk: suspend (Int) -> Unit
             speakNextChunk = { currentIndex ->
                 if (currentIndex < textChunks.size) {
                     val chunk = textChunks[currentIndex]
 
-                    runOnUiThread {
+                    withContext(Dispatchers.Main) {
                         ttsState = TtsState.Speaking
 
                         textToSpeech?.speak(
@@ -672,9 +662,7 @@ class MainActivity :
                                 if (utteranceId == "chunk_$currentIndex") {
                                     if (currentIndex + 1 < textChunks.size) {
                                         ttsState = TtsState.SwitchingChunk
-                                        // 延迟一点再播放下一段，避免太快
-                                        @OptIn(DelicateCoroutinesApi::class)
-                                        GlobalScope.launch {
+                                        ttsScope.launch {
                                             when (ttsEngine) {
                                                 TtsEngine.Sherpa -> {
                                                     // 无需延迟, Sherpa 本身不会太快
@@ -683,7 +671,7 @@ class MainActivity :
                                                     delay(500)
                                                 }
                                             }
-                                            runOnUiThread {
+                                            withContext(Dispatchers.Main) {
                                                 speakNextChunk(currentIndex + 1)
                                             }
                                         }
@@ -704,14 +692,14 @@ class MainActivity :
                         })
                     }
                 } else {
-                    runOnUiThread {
+                    withContext(Dispatchers.Main) {
                         ttsState = TtsState.Ready
                     }
                 }
             }
 
             // 开始播放第一段
-            runOnUiThread {
+            withContext(Dispatchers.Main) {
                 speakNextChunk(0)
             }
         }
@@ -748,13 +736,8 @@ class MainActivity :
         ttsState = TtsState.Ready
     }
 
-    @Suppress("unused")
     companion object {
         private const val KEY_LAST_LAUNCH_TIMESTAMP = "last_main_launch_timestamp"
-        const val IOS = "5_2.0"
-        const val ANDROID = "4_2.0"
-        const val WEB = "3_2.0"
-        const val ZSE93 = ZHIHU_WEB_ZSE93
         const val TAG = "MainActivity"
     }
 }

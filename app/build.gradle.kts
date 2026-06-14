@@ -8,11 +8,8 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 
 plugins {
     id("com.android.application")
-<<<<<<< HEAD
-=======
     id("com.mikepenz.aboutlibraries.plugin.android")
     kotlin("android")
->>>>>>> afb58205039fb418bd264b83544cc9e612ab9299
     kotlin("plugin.serialization")
     kotlin("plugin.compose")
     id("kotlin-parcelize")
@@ -40,10 +37,10 @@ ksp {
 
 android {
     namespace = "com.github.zly2006.zhihu"
-    compileSdk = 37
+    compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.github.zly2006.zhihu"
+        applicationId = "com.github.zly2006.zhplus"
         minSdk = 27
         targetSdk = 35
         versionCode = property("app.versionCode").toString().toIntOrNull() ?: 1
@@ -92,10 +89,7 @@ android {
             }
         }
     }
-<<<<<<< HEAD
-=======
 
->>>>>>> afb58205039fb418bd264b83544cc9e612ab9299
     buildTypes {
         val gitHash = gitHash(rootProject.projectDir)
         debug {
@@ -116,16 +110,11 @@ android {
         }
     }
     compileOptions {
-<<<<<<< HEAD
-        sourceCompatibility = JavaVersion.VERSION_24
-        targetCompatibility = JavaVersion.VERSION_24
-=======
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_25
+        targetCompatibility = JavaVersion.VERSION_25
     }
     kotlin {
-        jvmToolchain(17)
->>>>>>> afb58205039fb418bd264b83544cc9e612ab9299
+        jvmToolchain(25)
     }
     buildFeatures {
         viewBinding = true
@@ -166,13 +155,6 @@ android {
     }
 }
 
-<<<<<<< HEAD
-kotlin {
-    compilerOptions {
-        freeCompilerArgs.add("-Xdebug")
-        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_24)
-    }
-=======
 val generatedAndroidTestSecretsDir = layout.buildDirectory.dir("generated/androidTestSecrets")
 
 val prepareAndroidTestSecretAccount by tasks.registering {
@@ -200,13 +182,12 @@ tasks
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     compilerOptions.freeCompilerArgs.add("-Xdebug")
->>>>>>> afb58205039fb418bd264b83544cc9e612ab9299
 }
 
 tasks.withType<Test>().configureEach {
     javaLauncher.set(
         javaToolchains.launcherFor {
-            languageVersion.set(JavaLanguageVersion.of(21))
+            languageVersion.set(JavaLanguageVersion.of(25))
         },
     )
 }
@@ -251,30 +232,11 @@ dependencies {
 
     implementation("com.materialkolor:material-kolor:4.1.1")
 
-    // MIUIX - Xiaomi HyperOS Design Style Components
-    // https://github.com/compose-miuix-ui/miuix
-    val miuixVersion = "0.9.0"
-    implementation("top.yukonga.miuix.kmp:miuix-ui-android:$miuixVersion")
-    implementation("top.yukonga.miuix.kmp:miuix-icons-android:$miuixVersion")
-    implementation("top.yukonga.miuix.kmp:miuix-preference-android:$miuixVersion")
-    implementation("top.yukonga.miuix.kmp:miuix-shapes-android:$miuixVersion")
-    // miuix-blur 需要 minSdk 31，暂不启用
-    // implementation("top.yukonga.miuix.kmp:miuix-blur-android:$miuixVersion")
-
     implementation("org.jsoup:jsoup:1.22.1")
 
     // ZXing for QR code scanning
     implementation("com.journeyapps:zxing-android-embedded:4.3.0")
 
-<<<<<<< HEAD
-    implementation("androidx.core:core-ktx:1.17.0")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.10.0")
-
-    // Activity Embedding (平行视界)
-    implementation("androidx.window:window:1.3.0")
-    implementation("androidx.startup:startup-runtime:1.2.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.10.0")
-=======
     implementation("androidx.core:core-ktx:1.18.0")
     // Lifecycle (JetBrains KMP versions)
     implementation("org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose:$lifecycleVersion")
@@ -282,7 +244,6 @@ dependencies {
     // LiveData is Android-specific, keep androidx
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
     // Navigation (JetBrains KMP version)
->>>>>>> afb58205039fb418bd264b83544cc9e612ab9299
     //noinspection GradleDependency
     implementation("org.jetbrains.androidx.navigation:navigation-compose:2.9.2")
 

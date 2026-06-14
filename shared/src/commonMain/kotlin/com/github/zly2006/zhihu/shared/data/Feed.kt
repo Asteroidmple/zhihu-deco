@@ -425,7 +425,6 @@ data class FeedItemIndexGroup(
 @SerialName("moments_feed")
 data class MomentsFeed(
     val id: String,
-//    val interaction: Interaction? = null,
     val momentDesc: String = "",
     val target: Feed.Target,
     val targetType: String,
@@ -455,7 +454,7 @@ data class Person(
     val headline: String,
     val avatarUrl: String,
     val isOrg: Boolean = false,
-    val gender: Int = 0, // todo: 0做默认合适吗？
+    val gender: Int = 0, // 0=未设置, 1=男, -1=女
     @OptIn(ExperimentalSerializationApi::class)
     @JsonNames("followerCount")
     val followersCount: Int = 0,
